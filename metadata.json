@@ -1,0 +1,6 @@
+{
+  "name": "Aula Maestra Patricia - Asistente y Prácticas",
+  "description": "Asistente pedagógico para la docente Patricia Morinigo: resolución didáctica de ejercicios, generador de fichas de práctica en PDF para WhatsApp y seguimiento individual de progreso de alumnos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
