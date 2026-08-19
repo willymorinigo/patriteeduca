@@ -25,6 +25,12 @@ import {
 import { generateSolvedProblemPDF } from "../utils/pdfGenerator";
 import { getWhatsAppSolvedProblemMessage, openWhatsApp } from "../utils/whatsappHelper";
 import { generateLocalSolvedProblem } from "../utils/fallbackResolutions";
+import { 
+  SAMPLE_PROBLEMS_BANK, 
+  getRandomSampleProblems, 
+  SampleProblemItem 
+} from "../data/sampleProblemsData";
+import { RotateCw, Shuffle, Dices, BookOpen, Layers } from "lucide-react";
 
 interface ProblemSolverProps {
   students: Student[];
@@ -47,39 +53,41 @@ export const ProblemSolver: React.FC<ProblemSolverProps> = ({
   const [solvedResult, setSolvedResult] = useState<SolvedProblemResult | null>(null);
   const [copiedNotification, setCopiedNotification] = useState<boolean>(false);
   const [loggedNotification, setLoggedNotification] = useState<boolean>(false);
+  const [randomPickToast, setRandomPickToast] = useState<string | null>(null);
 
-  const sampleProblems: { label: string; subject: Subject; level: EducationLevel; text: string }[] = [
-    {
-      label: "Ecuación con fracciones (Matemática)",
-      subject: "Matemática",
-      level: "Secundaria Básica (1° a 3° año)",
-      text: "Resolver y verificar la siguiente ecuación: 2/3 (x - 1) + 1/2 = 3/4 x - 2",
-    },
-    {
-      label: "Fracciones y decimales (Primaria)",
-      subject: "Matemática",
-      level: "Primaria (4° a 6° año)",
-      text: "Juan compró 1 kilo y 3/4 de manzanas a $1.200 el kilo y 2 kilos y medio de naranjas a $800 el kilo. Si pagó con $5.000, ¿cuánto dinero le dieron de vuelto?",
-    },
-    {
-      label: "Análisis Sintáctico (Lengua)",
-      subject: "Prácticas del Lenguaje",
-      level: "Secundaria Básica (1° a 3° año)",
-      text: "Analizar sintácticamente la oración: 'Ayer por la tarde, los entusiastas alumnos de la profesora Patricia resolvieron los difíciles ejercicios de matemática con gran alegría.'",
-    },
-    {
-      label: "Problema de MRU (Física)",
-      subject: "Física",
-      level: "Secundaria Básica (1° a 3° año)",
-      text: "Un micro de larga distancia sale de Mar del Plata hacia La Plata a una velocidad constante de 90 km/h. Si la distancia es de 360 km y salió a las 08:30 hs, ¿a qué hora llegará a destino y cuántos metros recorre en cada segundo?",
-    },
-    {
-      label: "Estructura de Lewis (Química)",
-      subject: "Química",
-      level: "Secundaria Superior (4° a 6° año)",
-      text: "Explicar el tipo de unión química y graficar la estructura de Lewis para el Dióxido de Carbono (CO2) y para el Cloruro de Magnesio (MgCl2). Indicar si comparten o transfieren electrones.",
-    },
-  ];
+  // Dynamic sample problems state
+  const [sampleSubjectFilter, setSampleSubjectFilter] = useState<"Todos" | Subject>("Todos");
+  const [displayedSamples, setDisplayedSamples] = useState<SampleProblemItem[]>(() => 
+    getRandomSampleProblems("Todos", 4)
+  );
+
+  const handleFilterSampleSubject = (newFilter: "Todos" | Subject) => {
+    setSampleSubjectFilter(newFilter);
+    const newItems = getRandomSampleProblems(newFilter, 4);
+    setDisplayedSamples(newItems);
+  };
+
+  const handleShuffleSamples = () => {
+    const currentIds = displayedSamples.map((s) => s.id);
+    const newItems = getRandomSampleProblems(sampleSubjectFilter, 4, currentIds);
+    setDisplayedSamples(newItems);
+  };
+
+  const handleSelectSample = (sp: SampleProblemItem) => {
+    setSubject(sp.subject);
+    setLevel(sp.level);
+    setProblemText(sp.text);
+    setImagePreview(null);
+    setError(null);
+    setRandomPickToast(`Cargado: "${sp.label}"`);
+    setTimeout(() => setRandomPickToast(null), 3000);
+  };
+
+  const handleRandomPickInstant = () => {
+    const pool = SAMPLE_PROBLEMS_BANK;
+    const randomItem = pool[Math.floor(Math.random() * pool.length)];
+    handleSelectSample(randomItem);
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -345,6 +353,119 @@ export const ProblemSolver: React.FC<ProblemSolverProps> = ({
               )}
             </div>
 
+            {/* Ejemplos Rápidos Dinámicos y Variados - Por encima del botón de resolver */}
+            <div className="bg-slate-50/80 border border-slate-200/90 rounded-xl p-3.5 space-y-2.5">
+              <div className="flex items-center justify-between border-b border-slate-200/70 pb-2">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-5 h-5 rounded-md bg-amber-100 text-amber-800 flex items-center justify-center text-[10px] font-bold">
+                    <Lightbulb className="w-3 h-3" />
+                  </span>
+                  <div>
+                    <span className="text-xs font-bold text-slate-800 block leading-tight">
+                      Banco de Ejercicios de Prueba
+                    </span>
+                    <span className="text-[10px] text-slate-400">
+                      20+ opciones según diseño PBA
+                    </span>
+                  </div>
+                </div>
+
+                {/* Action buttons: Shuffle and Random */}
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={handleRandomPickInstant}
+                    title="Cargar 1 ejercicio al azar"
+                    className="px-2 py-0.5 bg-amber-100/80 hover:bg-amber-200/80 text-amber-900 border border-amber-300/60 rounded-md text-[10px] font-bold transition-colors flex items-center gap-1 shadow-2xs"
+                  >
+                    <Dices className="w-2.5 h-2.5 text-amber-700" />
+                    <span>Al Azar</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleShuffleSamples}
+                    title="Barajar y mostrar otras opciones"
+                    className="px-2 py-0.5 bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 hover:border-blue-200 rounded-md text-[10px] font-semibold transition-colors flex items-center gap-1 shadow-2xs"
+                  >
+                    <RotateCw className="w-2.5 h-2.5" />
+                    <span>Otras opciones</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Subject Filters */}
+              <div className="flex items-center gap-1 overflow-x-auto pb-0.5 scrollbar-none text-[10px]">
+                {(["Todos", "Matemática", "Prácticas del Lenguaje", "Física", "Química"] as const).map((filterName) => {
+                  const isActive = sampleSubjectFilter === filterName;
+                  const shortLabel = filterName === "Prácticas del Lenguaje" ? "Lengua" : filterName;
+                  return (
+                    <button
+                      key={filterName}
+                      type="button"
+                      onClick={() => handleFilterSampleSubject(filterName as any)}
+                      className={`px-2 py-0.5 rounded-md font-semibold transition-all shrink-0 ${
+                        isActive
+                          ? "bg-slate-900 text-white shadow-2xs"
+                          : "bg-white text-slate-600 hover:bg-slate-200/80 border border-slate-200/80"
+                      }`}
+                    >
+                      {shortLabel}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {randomPickToast && (
+                <div className="p-1.5 bg-blue-50 border border-blue-200 rounded-lg text-blue-800 text-[10px] font-semibold flex items-center justify-between animate-fadeIn">
+                  <span className="truncate">{randomPickToast}</span>
+                  <CheckCircle2 className="w-3 h-3 text-blue-600 shrink-0 ml-1" />
+                </div>
+              )}
+
+              {/* Cards List */}
+              <div className="space-y-1.5">
+                {displayedSamples.map((sp) => {
+                  const subjectBadgeColor =
+                    sp.subject === "Matemática"
+                      ? "bg-blue-50 text-blue-700 border-blue-200"
+                      : sp.subject === "Prácticas del Lenguaje"
+                      ? "bg-purple-50 text-purple-700 border-purple-200"
+                      : sp.subject === "Física"
+                      ? "bg-amber-50 text-amber-700 border-amber-200"
+                      : "bg-emerald-50 text-emerald-700 border-emerald-200";
+
+                  return (
+                    <button
+                      key={sp.id}
+                      type="button"
+                      onClick={() => handleSelectSample(sp)}
+                      className="w-full text-left p-2 rounded-lg bg-white border border-slate-200 hover:border-blue-400 hover:bg-blue-50/40 text-slate-800 font-medium transition-all flex flex-col gap-0.5 group shadow-2xs"
+                    >
+                      <div className="flex items-center justify-between gap-1 w-full">
+                        <div className="flex items-center gap-1.5 overflow-hidden">
+                          <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded border ${subjectBadgeColor} shrink-0`}>
+                            {sp.subject === "Prácticas del Lenguaje" ? "Lengua" : sp.subject}
+                          </span>
+                          <span className="text-[10px] text-slate-500 font-medium truncate">
+                            {sp.topic}
+                          </span>
+                        </div>
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider shrink-0">
+                          {sp.difficulty}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between gap-2 w-full">
+                        <span className="text-xs font-bold text-slate-900 group-hover:text-blue-700 truncate">
+                          {sp.label}
+                        </span>
+                        <ArrowRight className="w-3 h-3 text-slate-300 group-hover:text-blue-600 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             {error && (
               <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs flex items-start gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
@@ -370,34 +491,6 @@ export const ProblemSolver: React.FC<ProblemSolverProps> = ({
                 </>
               )}
             </button>
-          </div>
-
-          {/* Ejemplos Rápidos */}
-          <div className="bg-white border border-slate-200/90 rounded-2xl p-4 space-y-2.5 shadow-xs">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-              <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
-                Ejercicios de Prueba Rápida
-              </span>
-              <span className="text-[11px] text-slate-400">1 clic para cargar</span>
-            </div>
-            <div className="space-y-1.5">
-              {sampleProblems.map((sp, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => {
-                    setSubject(sp.subject);
-                    setLevel(sp.level);
-                    setProblemText(sp.text);
-                    setImagePreview(null);
-                  }}
-                  className="w-full text-left text-xs p-2.5 rounded-xl bg-slate-50 border border-slate-200 hover:border-blue-300 hover:bg-blue-50/50 text-slate-750 font-medium transition-all flex items-center justify-between group"
-                >
-                  <span className="truncate">{sp.label}</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-blue-600 shrink-0 ml-2" />
-                </button>
-              ))}
-            </div>
           </div>
         </div>
 
