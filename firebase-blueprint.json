@@ -1,0 +1,83 @@
+{
+  "entities": {
+    "Student": {
+      "title": "Student",
+      "description": "Alumno de clases particulares y apoyo escolar",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "grade": { "type": "string" },
+        "level": { "type": "string" },
+        "school": { "type": "string" },
+        "phone": { "type": "string" },
+        "parentName": { "type": "string" },
+        "targetSubjects": { "type": "array" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "status": { "type": "string" },
+        "shift": { "type": "string" },
+        "preferredSchedule": { "type": "string" },
+        "hourlyRate": { "type": "string" },
+        "paymentStatus": { "type": "string" },
+        "totalClassesAttended": { "type": "number" }
+      },
+      "required": ["id", "name", "grade", "level", "targetSubjects", "createdAt"]
+    },
+    "TopicRecord": {
+      "title": "TopicRecord",
+      "description": "Registro de clase o tema evaluado para un alumno",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "studentId": { "type": "string" },
+        "subject": { "type": "string" },
+        "topicTitle": { "type": "string" },
+        "date": { "type": "string" },
+        "status": { "type": "string" },
+        "score": { "type": "string" },
+        "teacherNotes": { "type": "string" },
+        "needsHomework": { "type": "boolean" },
+        "classDurationMinutes": { "type": "number" },
+        "classPaymentStatus": { "type": "string" },
+        "homeworkCompleted": { "type": "string" }
+      },
+      "required": ["id", "studentId", "subject", "topicTitle", "date", "status"]
+    },
+    "Worksheet": {
+      "title": "Worksheet",
+      "description": "Ficha didáctica de práctica generada",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "subject": { "type": "string" },
+        "level": { "type": "string" },
+        "topic": { "type": "string" },
+        "difficulty": { "type": "string" },
+        "studentName": { "type": "string" },
+        "studentId": { "type": "string" },
+        "date": { "type": "string" },
+        "pedagogicalIntro": { "type": "string" },
+        "exercises": { "type": "array" },
+        "resolutionTipsForTeacher": { "type": "array" },
+        "suggestedNextTopics": { "type": "array" }
+      },
+      "required": ["id", "title", "subject", "level", "topic", "difficulty", "date", "pedagogicalIntro", "exercises"]
+    }
+  },
+  "firestore": {
+    "/students/{studentId}": {
+      "schema": "Student",
+      "description": "Colección de alumnos de la maestra Patricia"
+    },
+    "/records/{recordId}": {
+      "schema": "TopicRecord",
+      "description": "Colección de registros de temas y clases"
+    },
+    "/worksheets/{worksheetId}": {
+      "schema": "Worksheet",
+      "description": "Colección de fichas didácticas generadas"
+    }
+  }
+}

@@ -9,7 +9,8 @@ import {
   Download, 
   Upload,
   Calendar,
-  UserCheck,
+  Cloud,
+  CloudCheck,
   MapPin
 } from "lucide-react";
 
@@ -18,6 +19,7 @@ interface NavbarProps {
   setActiveTab: (tab: string) => void;
   reinforcementCount: number;
   studentCount: number;
+  isCloudSynced?: boolean;
   onExportData: () => void;
   onImportData: () => void;
 }
@@ -27,6 +29,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   setActiveTab,
   reinforcementCount,
   studentCount,
+  isCloudSynced = true,
   onExportData,
   onImportData,
 }) => {
@@ -88,11 +91,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="font-bold text-base sm:text-lg text-white tracking-tight leading-tight">
-                  Aula Maestra Patricia
+                  Patric-IA te Educa
                 </h1>
                 <span className="bg-blue-500/20 text-blue-300 border border-blue-400/30 text-[11px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
                   <MapPin className="w-3 h-3 text-blue-400" />
                   PBA · Primaria y Secundaria
+                </span>
+                <span className="hidden md:flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" title="Los cambios se guardan y sincronizan automáticamente en la nube para todos los dispositivos y links compartidos">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  Nube Activa (Firebase)
                 </span>
               </div>
               <p className="text-xs text-slate-400 hidden sm:block">

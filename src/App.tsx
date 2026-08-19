@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Student, TopicRecord, Subject, Worksheet } from "./types";
 import { INITIAL_STUDENTS, INITIAL_RECORDS } from "./data/initialStudents";
 import { Navbar } from "./components/Navbar";
@@ -7,11 +7,25 @@ import { WorksheetGenerator } from "./components/WorksheetGenerator";
 import { StudentManager } from "./components/StudentManager";
 import { ReinforcementAlerts } from "./components/ReinforcementAlerts";
 import { CurriculumLibrary } from "./components/CurriculumLibrary";
+import { 
+  testFirestoreConnection, 
+} from "./firebase";
+import {
+  subscribeToStudents,
+  subscribeToRecords,
+  saveStudentToFirestore,
+  deleteStudentFromFirestore,
+  saveRecordToFirestore,
+  deleteRecordFromFirestore,
+  checkAndSeedInitialData,
+} from "./services/firebaseService";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>("solver");
+  const [isCloudSynced, setIsCloudSynced] = useState<boolean>(true);
+  const [isInitialLoadDone, setIsInitialLoadDone] = useState<boolean>(false);
 
-  // State with LocalStorage persistence
+  // State with LocalStorage fallback and Firestore synchronization
   const [students, setStudents] = useState<Student[]>(() => {
     try {
       const saved = localStorage.getItem("patricia_students");
@@ -38,7 +52,54 @@ export default function App() {
     studentId?: string;
   }>({});
 
-  // Persist to localStorage whenever state changes
+  // Connect to Firebase and establish real-time Firestore listeners
+  useEffect(() => {
+    let unsubscribeStudents: (() => void) | undefined;
+    let unsubscribeRecords: (() => void) | undefined;
+
+    async function initFirestore() {
+      try {
+        await testFirestoreConnection();
+
+        // Seed initial data once to Firestore only if database is completely empty
+        await checkAndSeedInitialData(INITIAL_STUDENTS, INITIAL_RECORDS);
+
+        // Real-time listener for students
+        unsubscribeStudents = subscribeToStudents((firestoreStudents) => {
+          setStudents(firestoreStudents);
+          setIsInitialLoadDone(true);
+          setIsCloudSynced(true);
+          try {
+            localStorage.setItem("patricia_students", JSON.stringify(firestoreStudents));
+          } catch (e) {
+            console.error("Local storage error:", e);
+          }
+        });
+
+        // Real-time listener for records
+        unsubscribeRecords = subscribeToRecords((firestoreRecords) => {
+          setRecords(firestoreRecords);
+          try {
+            localStorage.setItem("patricia_records", JSON.stringify(firestoreRecords));
+          } catch (e) {
+            console.error("Local storage error:", e);
+          }
+        });
+      } catch (err) {
+        console.error("Error initializing Firestore listeners:", err);
+        setIsCloudSynced(false);
+      }
+    }
+
+    initFirestore();
+
+    return () => {
+      if (unsubscribeStudents) unsubscribeStudents();
+      if (unsubscribeRecords) unsubscribeRecords();
+    };
+  }, []);
+
+  // Persist to localStorage whenever state changes as an offline fallback
   useEffect(() => {
     localStorage.setItem("patricia_students", JSON.stringify(students));
   }, [students]);
@@ -47,35 +108,70 @@ export default function App() {
     localStorage.setItem("patricia_records", JSON.stringify(records));
   }, [records]);
 
-  // Student CRUD operations
-  const handleAddStudent = (student: Student) => {
-    setStudents((prev) => [student, ...prev]);
+  // Student CRUD operations with Firestore synchronization
+  const handleAddStudent = async (student: Student) => {
+    setStudents((prev) => [student, ...prev.filter(s => s.id !== student.id)]);
+    try {
+      await saveStudentToFirestore(student);
+    } catch (err) {
+      console.error("Error saving student to Firestore:", err);
+    }
   };
 
-  const handleUpdateStudent = (updatedStudent: Student) => {
+  const handleUpdateStudent = async (updatedStudent: Student) => {
     setStudents((prev) =>
       prev.map((s) => (s.id === updatedStudent.id ? updatedStudent : s))
     );
+    try {
+      await saveStudentToFirestore(updatedStudent);
+    } catch (err) {
+      console.error("Error updating student in Firestore:", err);
+    }
   };
 
-  const handleDeleteStudent = (studentId: string) => {
+  const handleDeleteStudent = async (studentId: string) => {
     setStudents((prev) => prev.filter((s) => s.id !== studentId));
     setRecords((prev) => prev.filter((r) => r.studentId !== studentId));
+    try {
+      await deleteStudentFromFirestore(studentId);
+      // Also delete any associated topic records
+      const studentRecords = records.filter((r) => r.studentId === studentId);
+      for (const rec of studentRecords) {
+        await deleteRecordFromFirestore(rec.id);
+      }
+    } catch (err) {
+      console.error("Error deleting student from Firestore:", err);
+    }
   };
 
-  // Records CRUD operations
-  const handleAddRecord = (record: TopicRecord) => {
-    setRecords((prev) => [record, ...prev]);
+  // Records CRUD operations with Firestore synchronization
+  const handleAddRecord = async (record: TopicRecord) => {
+    setRecords((prev) => [record, ...prev.filter(r => r.id !== record.id)]);
+    try {
+      await saveRecordToFirestore(record);
+    } catch (err) {
+      console.error("Error saving record to Firestore:", err);
+    }
   };
 
-  const handleUpdateRecord = (updatedRecord: TopicRecord) => {
+  const handleUpdateRecord = async (updatedRecord: TopicRecord) => {
     setRecords((prev) =>
       prev.map((r) => (r.id === updatedRecord.id ? updatedRecord : r))
     );
+    try {
+      await saveRecordToFirestore(updatedRecord);
+    } catch (err) {
+      console.error("Error updating record in Firestore:", err);
+    }
   };
 
-  const handleDeleteRecord = (recordId: string) => {
+  const handleDeleteRecord = async (recordId: string) => {
     setRecords((prev) => prev.filter((r) => r.id !== recordId));
+    try {
+      await deleteRecordFromFirestore(recordId);
+    } catch (err) {
+      console.error("Error deleting record from Firestore:", err);
+    }
   };
 
   // Cross-tab actions
@@ -131,7 +227,7 @@ export default function App() {
   // Backup and Restore
   const handleExportData = () => {
     const data = {
-      app: "Aula Maestra Patricia",
+      app: "Patric-IA te Educa",
       exportDate: new Date().toISOString(),
       students,
       records,
@@ -151,20 +247,26 @@ export default function App() {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = ".json";
-    input.onchange = (e: any) => {
+    input.onchange = async (e: any) => {
       const file = e.target.files?.[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = (event) => {
+        reader.onload = async (event) => {
           try {
             const parsed = JSON.parse(event.target?.result as string);
             if (parsed.students && Array.isArray(parsed.students)) {
               setStudents(parsed.students);
+              for (const s of parsed.students) {
+                await saveStudentToFirestore(s);
+              }
             }
             if (parsed.records && Array.isArray(parsed.records)) {
               setRecords(parsed.records);
+              for (const r of parsed.records) {
+                await saveRecordToFirestore(r);
+              }
             }
-            alert("¡Copia de seguridad importada con éxito!");
+            alert("¡Copia de seguridad importada y sincronizada en la nube con éxito!");
           } catch {
             alert("El archivo no tiene un formato válido de copia de seguridad.");
           }
@@ -186,6 +288,7 @@ export default function App() {
         setActiveTab={setActiveTab}
         reinforcementCount={reinforcementCount}
         studentCount={students.length}
+        isCloudSynced={isCloudSynced}
         onExportData={handleExportData}
         onImportData={handleImportData}
       />
