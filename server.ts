@@ -10,6 +10,7 @@ const app = express();
 const PORT = 3000;
 
 app.use(express.json({ limit: "25mb" }));
+app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 
 // Helper to safely get Gemini client with the latest environment variable
 function getAIClient(): GoogleGenAI | null {

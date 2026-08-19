@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { generateWorksheetPDF } from "../utils/pdfGenerator";
 import { getWhatsAppWorksheetMessage, openWhatsApp } from "../utils/whatsappHelper";
+import { generateLocalWorksheet } from "../utils/fallbackResolutions";
 import { CURRICULUM_TOPICS_PBA } from "../data/curriculumData";
 
 interface WorksheetGeneratorProps {
@@ -203,20 +204,49 @@ export const WorksheetGenerator: React.FC<WorksheetGeneratorProps> = ({
         }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || "No se pudo generar la ficha.");
+      if (response.ok) {
+        const data: Worksheet = await response.json();
+        if (data && data.exercises && data.exercises.length > 0) {
+          if (selectedStudentId) {
+            data.studentId = selectedStudentId;
+          }
+          setCurrentWorksheet(data);
+          saveWorksheetToStorage(data);
+          return;
+        }
       }
 
-      const data: Worksheet = await response.json();
+      // Fallback local curriculum worksheet
+      const localWs = generateLocalWorksheet(
+        subject,
+        topic,
+        level,
+        difficulty,
+        exerciseCount,
+        studentName
+      );
       if (selectedStudentId) {
-        data.studentId = selectedStudentId;
+        localWs.studentId = selectedStudentId;
       }
-      setCurrentWorksheet(data);
-      saveWorksheetToStorage(data);
+      setCurrentWorksheet(localWs);
+      saveWorksheetToStorage(localWs);
     } catch (err: any) {
-      console.error(err);
-      setError(err.message || "Error al conectar con el generador con IA.");
+      console.warn("Generating worksheet using local fallback engine:", err);
+      const student = students.find((s) => s.id === selectedStudentId);
+      const studentName = student ? student.name : undefined;
+      const localWs = generateLocalWorksheet(
+        subject,
+        topic,
+        level,
+        difficulty,
+        exerciseCount,
+        studentName
+      );
+      if (selectedStudentId) {
+        localWs.studentId = selectedStudentId;
+      }
+      setCurrentWorksheet(localWs);
+      saveWorksheetToStorage(localWs);
     } finally {
       setIsLoading(false);
     }
