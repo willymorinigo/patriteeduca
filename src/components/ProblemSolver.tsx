@@ -28,7 +28,9 @@ import {
   Dices, 
   Layers,
   FileText,
-  HelpCircle
+  HelpCircle,
+  Search,
+  Wand2
 } from "lucide-react";
 import { generateSolvedProblemPDF } from "../utils/pdfGenerator";
 import { getWhatsAppSolvedProblemMessage, openWhatsApp } from "../utils/whatsappHelper";
@@ -36,6 +38,8 @@ import { generateLocalSolvedProblem } from "../utils/fallbackResolutions";
 import { 
   SAMPLE_PROBLEMS_BANK, 
   getRandomSampleProblems, 
+  searchSampleProblems,
+  generateLocalTopicExercise,
   SampleProblemItem 
 } from "../data/sampleProblemsData";
 
@@ -62,21 +66,23 @@ export const ProblemSolver: React.FC<ProblemSolverProps> = ({
   const [loggedNotification, setLoggedNotification] = useState<boolean>(false);
   const [randomPickToast, setRandomPickToast] = useState<string | null>(null);
 
-  // Dynamic sample problems state
+  // Dynamic sample problems & search state
+  const [searchTopicQuery, setSearchTopicQuery] = useState<string>("");
+  const [isGeneratingTopicExercise, setIsGeneratingTopicExercise] = useState<boolean>(false);
   const [sampleSubjectFilter, setSampleSubjectFilter] = useState<"Todos" | Subject>("Todos");
   const [displayedSamples, setDisplayedSamples] = useState<SampleProblemItem[]>(() => 
-    getRandomSampleProblems("Todos", 4)
+    getRandomSampleProblems("Todos", 3)
   );
 
   const handleFilterSampleSubject = (newFilter: "Todos" | Subject) => {
     setSampleSubjectFilter(newFilter);
-    const newItems = getRandomSampleProblems(newFilter, 4);
+    const newItems = getRandomSampleProblems(newFilter, 3);
     setDisplayedSamples(newItems);
   };
 
   const handleShuffleSamples = () => {
     const currentIds = displayedSamples.map((s) => s.id);
-    const newItems = getRandomSampleProblems(sampleSubjectFilter, 4, currentIds);
+    const newItems = getRandomSampleProblems(sampleSubjectFilter, 3, currentIds);
     setDisplayedSamples(newItems);
   };
 
@@ -94,6 +100,53 @@ export const ProblemSolver: React.FC<ProblemSolverProps> = ({
     const pool = SAMPLE_PROBLEMS_BANK;
     const randomItem = pool[Math.floor(Math.random() * pool.length)];
     handleSelectSample(randomItem);
+  };
+
+  // Generate an exercise on a specific topic with AI or curriculum engine
+  const handleGenerateTopicExercise = async (customQuery?: string) => {
+    const query = (customQuery || searchTopicQuery).trim();
+    if (!query) return;
+
+    setIsGeneratingTopicExercise(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/generate-sample-exercise", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          topic: query,
+          subject: sampleSubjectFilter !== "Todos" ? sampleSubjectFilter : subject,
+          level,
+        }),
+      });
+
+      let generatedItem: SampleProblemItem;
+      if (response.ok) {
+        generatedItem = await response.json();
+      } else {
+        generatedItem = generateLocalTopicExercise(
+          query,
+          sampleSubjectFilter !== "Todos" ? sampleSubjectFilter : subject,
+          level
+        );
+      }
+
+      handleSelectSample(generatedItem);
+      setRandomPickToast(`✨ Ejercicio armado: "${generatedItem.label}"`);
+      setTimeout(() => setRandomPickToast(null), 3500);
+    } catch (e) {
+      const localItem = generateLocalTopicExercise(
+        query,
+        sampleSubjectFilter !== "Todos" ? sampleSubjectFilter : subject,
+        level
+      );
+      handleSelectSample(localItem);
+      setRandomPickToast(`✨ Ejercicio armado: "${localItem.label}"`);
+      setTimeout(() => setRandomPickToast(null), 3500);
+    } finally {
+      setIsGeneratingTopicExercise(false);
+    }
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -258,9 +311,9 @@ export const ProblemSolver: React.FC<ProblemSolverProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Column 1: Input Form */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4 h-full flex flex-col justify-between">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3.5 h-full flex flex-col justify-between">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
                 <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
                   <span className="w-6 h-6 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center text-xs font-bold border border-blue-200">1</span>
                   Datos del Ejercicio
@@ -269,13 +322,13 @@ export const ProblemSolver: React.FC<ProblemSolverProps> = ({
               </div>
 
               {/* Materia y Nivel */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">Materia</label>
                   <select
                     value={subject}
                     onChange={(e) => setSubject(e.target.value as Subject)}
-                    className="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500 font-medium"
+                    className="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500 font-medium"
                   >
                     <option value="Matemática">📐 Matemática</option>
                     <option value="Prácticas del Lenguaje">📖 Prácticas del Lenguaje</option>
@@ -289,7 +342,7 @@ export const ProblemSolver: React.FC<ProblemSolverProps> = ({
                   <select
                     value={level}
                     onChange={(e) => setLevel(e.target.value as EducationLevel)}
-                    className="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500 font-medium"
+                    className="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500 font-medium"
                   >
                     <option value="Primaria (1° a 3° año)">Primaria (1° a 3°)</option>
                     <option value="Primaria (4° a 6° año)">Primaria (4° a 6°)</option>
@@ -307,7 +360,7 @@ export const ProblemSolver: React.FC<ProblemSolverProps> = ({
                 <select
                   value={selectedStudentId}
                   onChange={(e) => setSelectedStudentId(e.target.value)}
-                  className="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                  className="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">-- Sin alumno seleccionado (Uso general) --</option>
                   {students.map((s) => (
@@ -338,13 +391,13 @@ export const ProblemSolver: React.FC<ProblemSolverProps> = ({
                   value={problemText}
                   onChange={(e) => setProblemText(e.target.value)}
                   placeholder="Ejemplo: 'Resolver y verificar la siguiente ecuación...'"
-                  className="w-full text-xs sm:text-sm p-3 bg-slate-50/50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-hidden resize-y placeholder:text-slate-400"
+                  className="w-full text-xs sm:text-sm p-3 bg-slate-50/50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-hidden resize-y placeholder:text-slate-400 leading-relaxed min-h-[96px]"
                 />
               </div>
 
               {/* Adjuntar Foto del Ejercicio */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
                   O adjuntar foto / captura del ejercicio
                 </label>
                 {imagePreview ? (
@@ -352,7 +405,7 @@ export const ProblemSolver: React.FC<ProblemSolverProps> = ({
                     <img
                       src={imagePreview}
                       alt="Preview ejercicio"
-                      className="max-h-40 w-auto mx-auto rounded-lg object-contain"
+                      className="max-h-32 w-auto mx-auto rounded-lg object-contain"
                     />
                     <button
                       onClick={() => setImagePreview(null)}
@@ -363,10 +416,10 @@ export const ProblemSolver: React.FC<ProblemSolverProps> = ({
                     </button>
                   </div>
                 ) : (
-                  <label className="border-2 border-dashed border-slate-200 hover:border-blue-400 bg-slate-50/70 hover:bg-blue-50/30 rounded-xl p-3.5 flex flex-col items-center justify-center cursor-pointer transition-colors">
-                    <ImageIcon className="w-6 h-6 text-slate-400 mb-1" />
+                  <label className="border-2 border-dashed border-slate-200 hover:border-blue-400 bg-slate-50/70 hover:bg-blue-50/30 rounded-xl p-2.5 flex flex-col items-center justify-center cursor-pointer transition-colors">
+                    <ImageIcon className="w-5 h-5 text-slate-400 mb-0.5" />
                     <span className="text-xs font-semibold text-slate-700">Subir foto de carpeta o fotocopia</span>
-                    <span className="text-[11px] text-slate-400">JPG, PNG hasta 5MB</span>
+                    <span className="text-[10px] text-slate-400">JPG, PNG hasta 5MB</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -378,7 +431,7 @@ export const ProblemSolver: React.FC<ProblemSolverProps> = ({
               </div>
 
               {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs flex items-start gap-2">
+                <div className="p-2.5 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                   <span>{error}</span>
                 </div>
@@ -390,7 +443,7 @@ export const ProblemSolver: React.FC<ProblemSolverProps> = ({
               <button
                 onClick={handleSolve}
                 disabled={isLoading}
-                className="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-semibold text-sm py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-xs transition-all disabled:opacity-50"
+                className="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-semibold text-xs sm:text-sm py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-xs transition-all disabled:opacity-50"
               >
                 {isLoading ? (
                   <>
@@ -410,118 +463,234 @@ export const ProblemSolver: React.FC<ProblemSolverProps> = ({
 
         {/* Column 2: Banco de Ejercicios de Prueba Rápida */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-3.5 h-full flex flex-col">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center text-xs font-bold border border-amber-200">
-                  <Lightbulb className="w-3.5 h-3.5" />
-                </span>
-                <div>
-                  <h3 className="font-bold text-slate-900 text-sm">
-                    Banco de Ejercicios de Prueba
-                  </h3>
-                  <p className="text-[11px] text-slate-400">
-                    20+ opciones según diseño curricular PBA
-                  </p>
+          <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3 h-full flex flex-col justify-between">
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                <div className="flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center text-xs font-bold border border-amber-200">
+                    <Lightbulb className="w-3.5 h-3.5" />
+                  </span>
+                  <div>
+                    <h3 className="font-bold text-slate-900 text-sm">
+                      Banco de Ejercicios & Generador
+                    </h3>
+                    <p className="text-[11px] text-slate-400">
+                      20+ temas curriculares PBA o armá uno a medida
+                    </p>
+                  </div>
+                </div>
+
+                {/* Action buttons: Shuffle and Random */}
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={handleRandomPickInstant}
+                    title="Cargar 1 ejercicio al azar de cualquier materia"
+                    className="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 shadow-2xs"
+                  >
+                    <Dices className="w-3 h-3 text-amber-600" />
+                    <span>Al Azar</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleShuffleSamples}
+                    title="Barajar y mostrar otras opciones"
+                    className="px-2 py-1 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 hover:border-blue-200 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 shadow-2xs"
+                  >
+                    <RotateCw className="w-3 h-3" />
+                    <span>Otras</span>
+                  </button>
                 </div>
               </div>
 
-              {/* Action buttons: Shuffle and Random */}
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={handleRandomPickInstant}
-                  title="Cargar 1 ejercicio al azar de cualquier materia"
-                  className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 shadow-2xs"
-                >
-                  <Dices className="w-3 h-3 text-amber-600" />
-                  <span>Al Azar</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleShuffleSamples}
-                  title="Barajar y mostrar otras opciones"
-                  className="px-2.5 py-1 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 hover:border-blue-200 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 shadow-2xs"
-                >
-                  <RotateCw className="w-3 h-3" />
-                  <span>Otras opciones</span>
-                </button>
+              {/* Lupita & Search / Custom Topic Generator Bar */}
+              <div className="relative">
+                <div className="relative flex items-center">
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={searchTopicQuery}
+                    onChange={(e) => setSearchTopicQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && searchTopicQuery.trim()) {
+                        e.preventDefault();
+                        handleGenerateTopicExercise();
+                      }
+                    }}
+                    placeholder="Escribí un tema (ej: Ruffini, MRUV, Tales, Sintaxis)..."
+                    className="w-full text-xs sm:text-sm pl-9 pr-24 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium transition-all"
+                  />
+
+                  {/* Actions inside search input */}
+                  <div className="absolute right-1.5 flex items-center gap-1">
+                    {searchTopicQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setSearchTopicQuery("")}
+                        className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-200/60 transition-colors"
+                        title="Limpiar búsqueda"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                    {searchTopicQuery.trim() && (
+                      <button
+                        type="button"
+                        onClick={() => handleGenerateTopicExercise()}
+                        disabled={isGeneratingTopicExercise}
+                        title="Armar ejercicio sobre este tema específico"
+                        className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white rounded-lg text-[11px] font-semibold flex items-center gap-1 transition-all shadow-2xs disabled:opacity-50"
+                      >
+                        {isGeneratingTopicExercise ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <Sparkles className="w-3 h-3 text-amber-300" />
+                        )}
+                        <span>Armar</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
+
+              {/* Subject Filters */}
+              <div className="flex items-center gap-1 overflow-x-auto pt-0.5 pb-0.5 scrollbar-none text-xs">
+                {(["Todos", "Matemática", "Prácticas del Lenguaje", "Física", "Química"] as const).map((filterName) => {
+                  const isActive = sampleSubjectFilter === filterName;
+                  const shortLabel = filterName === "Prácticas del Lenguaje" ? "Lengua" : filterName;
+                  return (
+                    <button
+                      key={filterName}
+                      type="button"
+                      onClick={() => handleFilterSampleSubject(filterName as any)}
+                      className={`px-2.5 py-1 rounded-lg font-semibold text-[11px] transition-all shrink-0 ${
+                        isActive
+                          ? "bg-slate-900 text-white shadow-xs"
+                          : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200/60"
+                      }`}
+                    >
+                      {shortLabel}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {randomPickToast && (
+                <div className="p-2 px-3 bg-blue-50 border border-blue-200 rounded-xl text-blue-800 text-xs font-semibold flex items-center justify-between animate-fadeIn">
+                  <span className="truncate">{randomPickToast}</span>
+                  <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0 ml-1.5" />
+                </div>
+              )}
             </div>
 
-            {/* Subject Filters */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
-              {(["Todos", "Matemática", "Prácticas del Lenguaje", "Física", "Química"] as const).map((filterName) => {
-                const isActive = sampleSubjectFilter === filterName;
-                const shortLabel = filterName === "Prácticas del Lenguaje" ? "Lengua" : filterName;
-                return (
-                  <button
-                    key={filterName}
-                    type="button"
-                    onClick={() => handleFilterSampleSubject(filterName as any)}
-                    className={`px-3 py-1 rounded-lg font-semibold transition-all shrink-0 ${
-                      isActive
-                        ? "bg-slate-900 text-white shadow-xs"
-                        : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200/60"
-                    }`}
-                  >
-                    {shortLabel}
-                  </button>
-                );
-              })}
-            </div>
-
-            {randomPickToast && (
-              <div className="p-2 bg-blue-50 border border-blue-200 rounded-xl text-blue-800 text-xs font-semibold flex items-center justify-between animate-fadeIn">
-                <span className="truncate">{randomPickToast}</span>
-                <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0 ml-1.5" />
-              </div>
-            )}
-
-            {/* Cards List */}
-            <div className="space-y-2 flex-1 overflow-y-auto max-h-[460px] pr-0.5">
-              {displayedSamples.map((sp) => {
-                const subjectBadgeColor =
-                  sp.subject === "Matemática"
-                    ? "bg-blue-50 text-blue-700 border-blue-200"
-                    : sp.subject === "Prácticas del Lenguaje"
-                    ? "bg-purple-50 text-purple-700 border-purple-200"
-                    : sp.subject === "Física"
-                    ? "bg-amber-50 text-amber-700 border-amber-200"
-                    : "bg-emerald-50 text-emerald-700 border-emerald-200";
+            {/* Cards List: Clean without truncation so full problem content is visible */}
+            <div className="space-y-2.5 flex-1 pt-1">
+              {(() => {
+                const isSearching = searchTopicQuery.trim().length > 0;
+                const matchedItems = isSearching
+                  ? searchSampleProblems(searchTopicQuery, sampleSubjectFilter)
+                  : displayedSamples;
 
                 return (
-                  <button
-                    key={sp.id}
-                    type="button"
-                    onClick={() => handleSelectSample(sp)}
-                    className="w-full text-left p-3 rounded-xl bg-slate-50 border border-slate-200/90 hover:border-blue-400 hover:bg-blue-50/40 text-slate-800 font-medium transition-all flex flex-col gap-1.5 group shadow-2xs hover:shadow-xs"
-                  >
-                    <div className="flex items-center justify-between gap-1 w-full">
-                      <div className="flex items-center gap-1.5 overflow-hidden">
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${subjectBadgeColor} shrink-0`}>
-                          {sp.subject === "Prácticas del Lenguaje" ? "Lengua" : sp.subject}
-                        </span>
-                        <span className="text-xs text-slate-500 font-medium truncate">
-                          {sp.topic}
-                        </span>
+                  <>
+                    {/* If searching, offer quick AI generation card */}
+                    {isSearching && (
+                      <div className="p-2.5 px-3 bg-gradient-to-r from-blue-50/90 to-indigo-50/90 border border-blue-200/90 rounded-xl flex items-center justify-between gap-2 shadow-2xs">
+                        <div className="flex items-center gap-2 overflow-hidden">
+                          <Wand2 className="w-4 h-4 text-blue-600 shrink-0" />
+                          <div className="text-[11px] leading-snug">
+                            <span className="font-semibold text-slate-800">¿Buscás un ejercicio a medida? </span>
+                            <span className="text-blue-700 font-bold block sm:inline">Armar sobre "{searchTopicQuery.trim()}"</span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleGenerateTopicExercise()}
+                          disabled={isGeneratingTopicExercise}
+                          className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shrink-0 flex items-center gap-1 transition-all shadow-2xs disabled:opacity-50"
+                        >
+                          {isGeneratingTopicExercise ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                          )}
+                          <span>Generar</span>
+                        </button>
                       </div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">
-                        {sp.difficulty}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between gap-2 w-full">
-                      <span className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-blue-700 line-clamp-1">
-                        {sp.label}
-                      </span>
-                      <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-blue-600 shrink-0 group-hover:translate-x-0.5 transition-transform" />
-                    </div>
-                    <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
-                      {sp.text}
-                    </p>
-                  </button>
+                    )}
+
+                    {/* If search returned 0 items */}
+                    {isSearching && matchedItems.length === 0 ? (
+                      <div className="p-4 bg-slate-50 border border-dashed border-slate-200 rounded-xl text-center space-y-2.5">
+                        <p className="text-xs text-slate-600 font-medium">
+                          No encontramos un ejercicio prediseñado con el término <strong>"{searchTopicQuery}"</strong>.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => handleGenerateTopicExercise()}
+                          disabled={isGeneratingTopicExercise}
+                          className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-xs transition-all disabled:opacity-50"
+                        >
+                          {isGeneratingTopicExercise ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              <span>Creando ejercicio sobre "{searchTopicQuery}"...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                              <span>Armar ejercicio con IA sobre "{searchTopicQuery}"</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    ) : (
+                      matchedItems.map((sp) => {
+                        const subjectBadgeColor =
+                          sp.subject === "Matemática"
+                            ? "bg-blue-50 text-blue-700 border-blue-200"
+                            : sp.subject === "Prácticas del Lenguaje"
+                            ? "bg-purple-50 text-purple-700 border-purple-200"
+                            : sp.subject === "Física"
+                            ? "bg-amber-50 text-amber-700 border-amber-200"
+                            : "bg-emerald-50 text-emerald-700 border-emerald-200";
+
+                        return (
+                          <button
+                            key={sp.id}
+                            type="button"
+                            onClick={() => handleSelectSample(sp)}
+                            className="w-full text-left p-3 rounded-xl bg-slate-50 border border-slate-200/90 hover:border-blue-400 hover:bg-blue-50/40 text-slate-800 font-medium transition-all flex flex-col gap-1.5 group shadow-2xs hover:shadow-xs"
+                          >
+                            <div className="flex items-center justify-between gap-1.5 w-full">
+                              <div className="flex items-center gap-1.5">
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${subjectBadgeColor} shrink-0`}>
+                                  {sp.subject === "Prácticas del Lenguaje" ? "Lengua" : sp.subject}
+                                </span>
+                                <span className="text-xs text-slate-500 font-medium">
+                                  {sp.topic}
+                                </span>
+                              </div>
+                              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">
+                                {sp.difficulty}
+                              </span>
+                            </div>
+                            <div className="flex items-start justify-between gap-2 w-full">
+                              <span className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-blue-700 leading-snug">
+                                {sp.label}
+                              </span>
+                              <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-blue-600 shrink-0 mt-0.5 group-hover:translate-x-0.5 transition-transform" />
+                            </div>
+                            <p className="text-xs text-slate-600 leading-relaxed">
+                              {sp.text}
+                            </p>
+                          </button>
+                        );
+                      })
+                    )}
+                  </>
                 );
-              })}
+              })()}
             </div>
           </div>
         </div>

@@ -280,3 +280,172 @@ export function getRandomSampleProblems(
   const shuffled = [...source].sort(() => 0.5 - Math.random());
   return shuffled.slice(0, count);
 }
+
+// Search problems bank by keyword/topic across all fields
+export function searchSampleProblems(
+  query: string,
+  selectedSubject?: Subject | "Todos"
+): SampleProblemItem[] {
+  const cleanQ = query.toLowerCase().trim();
+  if (!cleanQ) return [];
+
+  let pool = SAMPLE_PROBLEMS_BANK;
+  if (selectedSubject && selectedSubject !== "Todos") {
+    pool = pool.filter((p) => p.subject === selectedSubject);
+  }
+
+  return pool.filter((p) => {
+    const textMatch = p.text.toLowerCase().includes(cleanQ);
+    const labelMatch = p.label.toLowerCase().includes(cleanQ);
+    const topicMatch = p.topic.toLowerCase().includes(cleanQ);
+    const subjectMatch = p.subject.toLowerCase().includes(cleanQ);
+    const difficultyMatch = p.difficulty.toLowerCase().includes(cleanQ);
+    return textMatch || labelMatch || topicMatch || subjectMatch || difficultyMatch;
+  });
+}
+
+// Generate an authentic curricular exercise for any typed topic
+export function generateLocalTopicExercise(
+  topicQuery: string,
+  currentSubject: Subject = "Matemática",
+  currentLevel: EducationLevel = "Secundaria Básica (1° a 3° año)"
+): SampleProblemItem {
+  const q = topicQuery.toLowerCase().trim();
+
+  // Detect subject if not explicitly matching
+  let inferredSubject: Subject = currentSubject;
+  let inferredLevel: EducationLevel = currentLevel;
+  let difficulty: "Básico" | "Intermedio" | "Avanzado" = "Intermedio";
+
+  if (q.includes("quim") || q.includes("mol") || q.includes("estequio") || q.includes("tabla periodica") || q.includes("oxido") || q.includes("lewis") || q.includes("atomo")) {
+    inferredSubject = "Química";
+  } else if (q.includes("fisic") || q.includes("mru") || q.includes("mruv") || q.includes("newton") || q.includes("fuerza") || q.includes("calor") || q.includes("cinematica") || q.includes("caida libre")) {
+    inferredSubject = "Física";
+  } else if (q.includes("lengua") || q.includes("sintax") || q.includes("sujeto") || q.includes("predicado") || q.includes("oracion") || q.includes("acento") || q.includes("texto") || q.includes("verbo") || q.includes("tilde")) {
+    inferredSubject = "Prácticas del Lenguaje";
+  } else if (q.includes("mat") || q.includes("ecuacion") || q.includes("fraccion") || q.includes("pitagoras") || q.includes("bhaskara") || q.includes("derivada") || q.includes("trigono") || q.includes("proporc") || q.includes("regla de tres")) {
+    inferredSubject = "Matemática";
+  }
+
+  // Pre-crafted authentic exercises for popular curriculum topics
+  if (q.includes("tales") || q.includes("thales")) {
+    return {
+      id: `gen_${Date.now()}`,
+      label: "Teorema de Tales: Segmentos proporcionales",
+      topic: "Teorema de Tales y Proporcionalidad",
+      subject: "Matemática",
+      level: "Secundaria Básica (1° a 3° año)",
+      difficulty: "Intermedio",
+      text: "Tres rectas paralelas a, b y c son cortadas por dos rectas transversales r y s. Sobre la recta r se determinan los segmentos AB = 6 cm y BC = 9 cm. Sobre la recta s, el segmento A'B' mide 4 cm. Aplicar el Teorema de Tales para calcular la longitud del segmento B'C' y graficar el esquema.",
+    };
+  }
+
+  if (q.includes("ruffini") || q.includes("gauss") || q.includes("polinomio")) {
+    return {
+      id: `gen_${Date.now()}`,
+      label: "División de Polinomios por Regla de Ruffini",
+      topic: "Polinomios y Regla de Ruffini",
+      subject: "Matemática",
+      level: "Secundaria Superior (4° a 6° año)",
+      difficulty: "Intermedio",
+      text: "Dado el polinomio P(x) = 2x³ - 5x² + 4x - 6 y el divisor Q(x) = x - 2: a) Realizar la división utilizando la Regla de Ruffini. b) Indicar el polinomio cociente C(x) y el resto R. c) Verificar el resto aplicando el Teorema del Resto P(2).",
+    };
+  }
+
+  if (q.includes("mruv") || q.includes("acelerac")) {
+    return {
+      id: `gen_${Date.now()}`,
+      label: "Movimiento Rectilíneo Uniformemente Variado (MRUV)",
+      topic: "Cinemática y MRUV",
+      subject: "Física",
+      level: "Secundaria Superior (4° a 6° año)",
+      difficulty: "Intermedio",
+      text: "Un automóvil que viaja en línea recta por la autopista a una velocidad inicial de 72 km/h (20 m/s) frena de manera constante con una aceleración de -2,5 m/s² hasta detenerse por completo. Calcular: a) El tiempo total que tarda en frenar. b) La distancia recorrida durante el frenado.",
+    };
+  }
+
+  if (q.includes("caida libre") || q.includes("tiro vertical")) {
+    return {
+      id: `gen_${Date.now()}`,
+      label: "Caída Libre y Tiro Vertical",
+      topic: "Cinemática y Gravedad",
+      subject: "Física",
+      level: "Secundaria Superior (4° a 6° año)",
+      difficulty: "Intermedio",
+      text: "Se deja caer una pelota desde la terraza de un edificio de 45 metros de altura. Despreciando el rozamiento con el aire y tomando la aceleración de la gravedad g = 9,8 m/s²: a) ¿Cuánto tiempo tarda en llegar al suelo? b) ¿Con qué velocidad (en m/s y en km/h) impacta contra el piso?",
+    };
+  }
+
+  if (q.includes("logaritm")) {
+    return {
+      id: `gen_${Date.now()}`,
+      label: "Ecuaciones Logarítmicas y Propiedades",
+      topic: "Logaritmos",
+      subject: "Matemática",
+      level: "Secundaria Superior (4° a 6° año)",
+      difficulty: "Avanzado",
+      text: "Resolver la siguiente ecuación logarítmica aplicando la propiedad del logaritmo de un producto y la definición: log₂(x + 2) + log₂(x - 2) = 5. Indicar el dominio de validez y verificar la solución obtenida.",
+    };
+  }
+
+  if (q.includes("oracion compuesta") || q.includes("coordinada") || q.includes("subordinada")) {
+    return {
+      id: `gen_${Date.now()}`,
+      label: "Análisis de Oración Compuesta por Coordinación",
+      topic: "Sintaxis: Oraciones Compuestas",
+      subject: "Prácticas del Lenguaje",
+      level: "Secundaria Superior (4° a 6° año)",
+      difficulty: "Avanzado",
+      text: "Analizar sintácticamente y clasificar la siguiente oración compuesta: [Los alumnos repasaron todas las fórmulas en el aula], pero [el profesor propuso un desafío integrador muy creativo]. Marcar proposiciones, nexo coordinante adversativo y estructuras internas.",
+    };
+  }
+
+  if (q.includes("ley de ohm") || q.includes("circuito") || q.includes("resistencia")) {
+    return {
+      id: `gen_${Date.now()}`,
+      label: "Ley de Ohm y Circuitos Eléctricos en Serie",
+      topic: "Electricidad y Ley de Ohm",
+      subject: "Física",
+      level: "Secundaria Básica (1° a 3° año)",
+      difficulty: "Intermedio",
+      text: "Un circuito eléctrico simple está conectado a una fuente de tensión de 220 V y contiene dos resistencias en serie: R1 = 40 Ω y R2 = 70 Ω. Calcular: a) La resistencia equivalente total del circuito (Req). b) La intensidad de corriente eléctrica total (I) que circula por el circuito. c) La caída de tensión en cada resistencia.",
+    };
+  }
+
+  if (q.includes("oxido") || q.includes("nomenclatura")) {
+    return {
+      id: `gen_${Date.now()}`,
+      label: "Nomenclatura y Formación de Óxidos Básicos y Ácidos",
+      topic: "Compuestos Inorgánicos",
+      subject: "Química",
+      level: "Secundaria Básica (1° a 3° año)",
+      difficulty: "Intermedio",
+      text: "Escribir la ecuación química balanceada de formación y nombrar por nomenclatura tradicional y IUPAC/moderna para: a) La combinación de Hierro con valencia III con Oxígeno molecular (Fe + O₂). b) La combinación de Azufre con valencia IV con Oxígeno (S + O₂).",
+    };
+  }
+
+  if (q.includes("proporc") || q.includes("regla de tres") || q.includes("porcentaje")) {
+    return {
+      id: `gen_${Date.now()}`,
+      label: `Problema de aplicación sobre ${topicQuery}`,
+      topic: topicQuery,
+      subject: "Matemática",
+      level: inferredLevel,
+      difficulty: "Básico",
+      text: `Un taller de confección textil en Avellaneda produce 85 prendas de abrigo con 15 metros de tela de algodón. a) ¿Cuántas prendas idénticas se podrán confeccionar con 45 metros de tela? b) Si se desea producir 340 prendas para un pedido escolar, ¿cuántos metros de tela se deberán comprar? Plantear la Regla de Tres Simple y verificar.`,
+    };
+  }
+
+  // Generic customized curricular exercise
+  const capitalizedTopic = topicQuery.charAt(0).toUpperCase() + topicQuery.slice(1);
+  return {
+    id: `gen_${Date.now()}`,
+    label: `Ejercicio de práctica: ${capitalizedTopic}`,
+    topic: capitalizedTopic,
+    subject: inferredSubject,
+    level: inferredLevel,
+    difficulty,
+    text: `Plantear, resolver y justificar paso a paso el siguiente ejercicio sobre ${capitalizedTopic} correspondiente a ${inferredSubject} (${inferredLevel}): Desarrollar los cálculos con precisión, detallar las propiedades y fórmulas aplicadas en cada renglón y verificar el resultado final.`,
+  };
+}
+

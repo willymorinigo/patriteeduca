@@ -265,17 +265,472 @@ function generateFallbackSolution(problemText: string, subject: string, level: s
   const cleanLevel = level || "Secundaria";
   const norm = (problemText || "").toLowerCase();
 
-  if (cleanSubject.includes("Lengua") || cleanSubject.includes("Prácticas del Lenguaje")) {
+  // 1. REGLA DE TRES SIMPLE / PROPORCIONALIDAD DIRECTA E INVERSA
+  if (
+    norm.includes("regla de tres") ||
+    norm.includes("proporcionalidad") ||
+    norm.includes("alfajor") ||
+    norm.includes("paquete") ||
+    norm.includes("harina") ||
+    (norm.includes("con ") && norm.includes("se elaboran")) ||
+    (norm.includes("con ") && norm.includes("se hacen")) ||
+    (norm.includes("si ") && norm.includes("cuánto") && (norm.includes("cuesta") || norm.includes("litros") || norm.includes("kilos") || norm.includes("días")))
+  ) {
+    const isAlfajores = norm.includes("alfajor") || norm.includes("mar del plata") || norm.includes("72");
+    
+    if (isAlfajores) {
+      return {
+        problemTitle: "Regla de Tres Simple Directa (Proporcionalidad)",
+        subject: "Matemática",
+        level: cleanLevel,
+        originalProblem: problemText || "En una fábrica de Mar del Plata, con 3 paquetes de harina se elaboran 72 alfajores artesanales. ¿Cuántos alfajores se podrán hacer con 8 paquetes iguales? ¿Cuántos paquetes se necesitan para 240 alfajores?",
+        stepByStep: [
+          {
+            stepNumber: 1,
+            title: "Identificar magnitudes y clasificar el tipo de proporcionalidad",
+            mathDevelopment: "Magnitudes involucradas:\n• Magnitud A: Cantidad de paquetes de harina\n• Magnitud B: Cantidad de alfajores artesanales elaborados\n\nAnálisis cualitativo: A mayor cantidad de paquetes de harina (+), se elaborará mayor cantidad de alfajores (+).\n==> Se trata de PROPORCIONALIDAD DIRECTA.",
+            appliedRule: "Definición de Proporcionalidad Directa (ambas magnitudes aumentan o disminuyen en la misma proporción)",
+            explanation: "Cuando dos magnitudes crecen juntas al multiplicarse por el mismo factor, la relación es directa. Esto indica que se resuelve por Regla de Tres Simple Directa o por reducción a la unidad.",
+            practicalTip: "Preguntale siempre al alumno: '¿Si compro el doble de paquetes, me salen más o menos alfajores?'. Si la respuesta es 'más', es Directa.",
+          },
+          {
+            stepNumber: 2,
+            title: "Calcular la constante de proporcionalidad directa (k) por unidad",
+            mathDevelopment: "k = (Cantidad de alfajores) / (Cantidad de paquetes)\nk = 72 alfajores / 3 paquetes\nk = 24 alfajores por cada paquete de harina",
+            appliedRule: "Constante de Proporcionalidad Directa: k = y / x",
+            explanation: "Dividimos la cantidad total de alfajores por la cantidad de paquetes conocidos para averiguar cuántos alfajores rinde exactamente 1 solo paquete (valor unitario).",
+            practicalTip: "Averiguar 'cuánto vale 1' (reducción a la unidad) es la forma más fácil y comprensible para que los chicos no se confundan.",
+          },
+          {
+            stepNumber: 3,
+            title: "Pregunta 1: Calcular la producción de alfajores con 8 paquetes",
+            mathDevelopment: "Planteo de Regla de Tres Simple Directa:\n  3 paquetes ---------> 72 alfajores\n  8 paquetes ---------> X alfajores\n\nCálculo cruzado:\nX = (8 paquetes · 72 alfajores) / 3 paquetes\nX = 576 / 3\nX = 192 alfajores\n\n(Comprobación directa con k: 8 · 24 = 192 alfajores)",
+            appliedRule: "Regla de Tres Simple Directa: X = (b · c) / a",
+            explanation: "Multiplicamos los valores cruzados (8 por 72) y dividimos por el paquete restante (3). El resultado son 192 alfajores.",
+            practicalTip: "En la regla de tres directa: 'se multiplica cruzado y se divide por el que queda solo enfrente'.",
+          },
+          {
+            stepNumber: 4,
+            title: "Pregunta 2: Calcular cuántos paquetes se necesitan para 240 alfajores",
+            mathDevelopment: "Planteo de Regla de Tres Inversa de la incógnita:\n  72 alfajores ---------> 3 paquetes\n  240 alfajores -------> Y paquetes\n\nCálculo:\nY = (240 alfajores · 3 paquetes) / 72 alfajores\nY = 720 / 72\nY = 10 paquetes\n\n(Comprobación directa con k: 240 / 24 = 10 paquetes)",
+            appliedRule: "Cálculo de antecedente proporcional: Y = Total / k",
+            explanation: "Ahora conocemos la cantidad deseada de alfajores (240) y dividimos por el rendimiento de 1 paquete (24 alfajores), obteniendo 10 paquetes.",
+            practicalTip: "Alinear siempre las mismas unidades en la misma columna: alfajores debajo de alfajores y paquetes debajo de paquetes.",
+          },
+          {
+            stepNumber: 5,
+            title: "Tabla de valores completa y redacción final de respuestas",
+            mathDevelopment: "Tabla de Proporcionalidad Directa (k = 24):\n┌─────────────────────┬────┬────┬─────┬─────┐\n│ Paquetes de harina  │ 1  │ 3  │ 8   │ 10  │\n├─────────────────────┼────┼────┼─────┼─────┤\n│ Cantidad alfajores  │ 24 │ 72 │ 192 │ 240 │\n└─────────────────────┴────┴────┴─────┴─────┘",
+            appliedRule: "Representación Tabular y Verificación de Constancia de Cociente",
+            explanation: "Verificamos que todos los pares cumplan y/x = 24 (24/1 = 72/3 = 192/8 = 240/10 = 24). Las respuestas responden con claridad ambas consignas.",
+            practicalTip: "Hacer una tablita ordenada en la hoja permite detectar a simple vista si algún número quedó fuera de proporción.",
+          },
+        ],
+        finalAnswer: "1) Con 8 paquetes se elaboran 192 alfajores artesanales. 2) Para elaborar 240 alfajores se necesitan 10 paquetes de harina.",
+        pedagogicalTips: [
+          "Explicar siempre el concepto de 'reducción a la unidad': averiguar primero cuánto rinde 1 paquete para que el alumno entienda el porqué de la cuenta.",
+          "Ordenar los datos en dos columnas con sus nombres (Paquetes | Alfajores) para evitar mezclar magnitudes.",
+          "Verificar la coherencia lógica: si con 3 paquetes se hacen 72, con 8 paquetes tiene que dar bastante más que 72 (192 es coherente).",
+        ],
+        commonPitfalls: [
+          "Multiplicar derecho en vez de cruzado al aplicar la regla de tres simple directa.",
+          "Mezclar las magnitudes en el planteo (poner alfajores debajo de paquetes).",
+          "Olvidar responder con la oración completa y colocar solo el número sin la unidad ('192 alfajores', '10 paquetes').",
+        ],
+        reinforcementConcept: "En la proporcionalidad directa, el cociente entre ambas magnitudes permanece siempre constante (k = y / x).",
+      };
+    }
+
+    const numbers = (problemText.match(/\d+(?:[.,]\d+)?/g) || []).map((n) => parseFloat(n.replace(",", ".")));
+    const a = numbers[0] || 4;
+    const b = numbers[1] || 100;
+    const c = numbers[2] || 10;
+    const resDirect = ((c * b) / a);
+    const resFormatted = Number.isInteger(resDirect) ? resDirect.toString() : resDirect.toFixed(2);
+    const kVal = (b / a);
+    const kFormatted = Number.isInteger(kVal) ? kVal.toString() : kVal.toFixed(2);
+
+    return {
+      problemTitle: "Regla de Tres Simple y Proporcionalidad",
+      subject: "Matemática",
+      level: cleanLevel,
+      originalProblem: problemText,
+      stepByStep: [
+        {
+          stepNumber: 1,
+          title: "Identificación de Magnitudes y Tipo de Relación",
+          mathDevelopment: `Planteo de datos extraídos:\n• Magnitud 1 = ${a} unidades  ====>  Magnitud 2 = ${b} unidades\n• Para ${c} unidades de Magnitud 1  ====>  Incógnita (X) = ?\n\nRelación: Proporcionalidad Directa`,
+          appliedRule: "Planteo de Regla de Tres Simple Directa",
+          explanation: "Organizamos los datos en dos columnas alineando magnitudes semejantes en la misma vertical.",
+          practicalTip: "Anotar siempre las unidades para no confundir qué valor corresponde a cada columna.",
+        },
+        {
+          stepNumber: 2,
+          title: "Cálculo del Valor Unitario (Constante de Proporcionalidad k)",
+          mathDevelopment: `k = ${b} / ${a} = ${kFormatted} por unidad`,
+          appliedRule: "Constante de Proporcionalidad: k = Y / X",
+          explanation: "Dividimos el total por la cantidad inicial para saber el valor equivalente a 1 unidad.",
+          practicalTip: "Conocer el valor de 1 unidad simplifica cualquier cálculo posterior.",
+        },
+        {
+          stepNumber: 3,
+          title: "Despeje y Resolución de la Incógnita (X)",
+          mathDevelopment: `X = (${c} · ${b}) / ${a}\nX = ${c * b} / ${a}\nX = ${resFormatted}`,
+          appliedRule: "Multiplicación Cruzada en Regla de Tres Directa: X = (c · b) / a",
+          explanation: "Multiplicamos los términos cruzados y dividimos por el término opuesto a la incógnita.",
+          practicalTip: "Comprobar que el resultado aumente o disminuya en concordancia con el cambio de la primera magnitud.",
+        },
+      ],
+      finalAnswer: `Resultado = ${resFormatted} (Constante k = ${kFormatted})`,
+      pedagogicalTips: [
+        "Verificar que las columnas tengan siempre la misma unidad de medida.",
+        "Comprobar el resultado multiplicando la constante unitaria k por la nueva cantidad.",
+      ],
+      commonPitfalls: [
+        "Invertir la fracción o dividir por el número incorrecto.",
+        "Confundir proporcionalidad directa con inversa.",
+      ],
+      reinforcementConcept: "En toda regla de tres directa, la multiplicación cruzada de los extremos y medios es idéntica.",
+    };
+  }
+
+  // 2. FRACCIONES Y COMPRAS EN LA VERDULERÍA
+  if (
+    norm.includes("verduler") ||
+    norm.includes("manzana") ||
+    norm.includes("papa") ||
+    norm.includes("vuelto") ||
+    (norm.includes("kilo") && norm.includes("compró"))
+  ) {
+    return {
+      problemTitle: "Problema de Compras, Fracciones y Números Decimales",
+      subject: "Matemática",
+      level: cleanLevel,
+      originalProblem: problemText || "Juan fue a la verdulería del barrio y compró 1 kilo y 3/4 de manzanas a $1.200 el kilo, y 2 kilos y medio de papas a $800 el kilo. Si pagó con un billete de $5.000, ¿cuánto dinero le dieron de vuelto?",
+      stepByStep: [
+        {
+          stepNumber: 1,
+          title: "Expresar las cantidades de kilogramos en forma decimal y fraccionaria",
+          mathDevelopment: "• Manzanas: 1 kilo y 3/4 kg = 1 + 3/4 = 1 + 0,75 = 1,75 kg (o 7/4 kg)\n• Papas: 2 kilos y medio = 2 + 1/2 = 2 + 0,50 = 2,50 kg (o 5/2 kg)",
+          appliedRule: "Conversión de Números Mixtos a Decimales y Fracciones Impropias",
+          explanation: "Convertimos las fracciones usuales (3/4 = 0,75 y 1/2 = 0,5) para facilitar las operaciones multiplicativas con los precios por kilogramo.",
+          practicalTip: "Recordar a los chicos equivalencias visuales cotidianas: 1/4 = 0,25 | 1/2 = 0,50 | 3/4 = 0,75.",
+        },
+        {
+          stepNumber: 2,
+          title: "Calcular el costo total de las manzanas",
+          mathDevelopment: "Precio unitario: $1.200 por kg\nCantidad: 1,75 kg\n\nCálculo:\nGasto manzanas = 1,75 kg · $1.200\nGasto manzanas = 1 kg · $1.200 + 0,75 kg · $1.200\nGasto manzanas = $1.200 + $900 = $2.100\n(Por fracción: 7/4 · 1200 = 7 · 300 = $2.100)",
+          appliedRule: "Multiplicación de Número Decimal por Entero / Fracción de una Cantidad",
+          explanation: "Multiplicamos los 1,75 kg por el valor de cada kilo ($1.200) para obtener el importe exacto de las manzanas.",
+          practicalTip: "Hacer el desglose mental: 1 kilo son $1200, medio kilo son $600 y un cuarto son $300 -> 1200 + 600 + 300 = $2100.",
+        },
+        {
+          stepNumber: 3,
+          title: "Calcular el costo total de las papas",
+          mathDevelopment: "Precio unitario: $800 por kg\nCantidad: 2,50 kg\n\nCálculo:\nGasto papas = 2,50 kg · $800\nGasto papas = 2 kg · $800 + 0,50 kg · $800\nGasto papas = $1.600 + $400 = $2.000\n(Por fracción: 5/2 · 800 = 5 · 400 = $2.000)",
+          appliedRule: "Multiplicación Proporcional Directa",
+          explanation: "Multiplicamos los 2,5 kg por los $800 que vale el kilo de papas, dando un total de $2.000.",
+          practicalTip: "Multiplicar por 2,5 es lo mismo que duplicar y sumarle la mitad del número.",
+        },
+        {
+          stepNumber: 4,
+          title: "Calcular el gasto total acumulado en la verdulería",
+          mathDevelopment: "Gasto Total = Gasto Manzanas + Gasto Papas\nGasto Total = $2.100 + $2.000\nGasto Total = $4.100",
+          appliedRule: "Suma de Importes Parciales",
+          explanation: "Sumamos lo que costaron las manzanas más lo que costaron las papas para saber el total que Juan debe pagar en la caja.",
+          practicalTip: "Alinear las unidades de mil y centenas para sumar prolijamente.",
+        },
+        {
+          stepNumber: 5,
+          title: "Calcular el vuelto restando del billete de pago ($5.000)",
+          mathDevelopment: "Dinero entregado: $5.000\nGasto a descontar: $4.100\n\nVuelto = $5.000 - $4.100\nVuelto = $900",
+          appliedRule: "Operación de Resta / Diferencia Económica",
+          explanation: "Restamos el gasto total ($4.100) del valor del billete entregado ($5.000). A Juan le devuelven $900.",
+          practicalTip: "Verificar la resta haciendo la suma inversa: $4.100 + $900 = $5.000 ✓.",
+        },
+      ],
+      finalAnswer: "Gasto Total en la verdulería = $4.100 | Vuelto que recibe Juan = $900",
+      pedagogicalTips: [
+        "Enseñar el cálculo mental del almacén: 1 kg ($1200) + 3/4 kg ($900) = $2100.",
+        "Hacer que el alumno anote con claridad qué corresponde a cada verdura.",
+        "Recordar que el vuelto es siempre la diferencia entre lo que se entrega y lo que se gasta.",
+      ],
+      commonPitfalls: [
+        "Confundir 3/4 con 0,34 en lugar de 0,75.",
+        "Calcular el gasto de una sola verdura y olvidarse de sumar la otra antes de calcular el vuelto.",
+        "No colocar el signo pesos ($) en las respuestas monetarias.",
+      ],
+      reinforcementConcept: "Una fracción de una cantidad se calcula multiplicando el número por el numerador y dividiendo por el denominador.",
+    };
+  }
+
+  // 3. GEOMETRÍA - PERÍMETRO Y SUPERFICIE
+  if (
+    norm.includes("patio") ||
+    norm.includes("perímetro") ||
+    norm.includes("superficie") ||
+    (norm.includes("rectangular") && norm.includes("ancho") && norm.includes("largo"))
+  ) {
+    return {
+      problemTitle: "Cálculo de Perímetro y Superficie (Geometría)",
+      subject: "Matemática",
+      level: cleanLevel,
+      originalProblem: problemText || "El patio de la escuela tiene forma rectangular, mide 18,5 metros de largo y 12 metros de ancho. Quieren cercarlo con una cinta de peligro y pintar todo el piso. Calcular el perímetro total y la superficie en metros cuadrados.",
+      stepByStep: [
+        {
+          stepNumber: 1,
+          title: "Identificar la figura geométrica y extraer dimensiones",
+          mathDevelopment: "Figura: Rectángulo\n• Largo (base b) = 18,5 m\n• Ancho (altura h) = 12 m",
+          appliedRule: "Propiedades del Rectángulo (lados opuestos iguales de a pares)",
+          explanation: "Un rectángulo tiene 4 lados: 2 lados de largo igual a 18,5 m y 2 lados de ancho igual a 12 m.",
+          practicalTip: "Hacer siempre un dibujo del rectángulo en la hoja con las medidas anotadas en cada lado.",
+        },
+        {
+          stepNumber: 2,
+          title: "Cálculo del Perímetro total (longitud de la cinta de peligro)",
+          mathDevelopment: "Fórmula: P = 2 · largo + 2 · ancho\nP = 2 · (18,5 m) + 2 · (12 m)\nP = 37 m + 24 m\nP = 61 metros",
+          appliedRule: "Perímetro de una figura plana (suma de todos sus lados exteriores)",
+          explanation: "El perímetro es el contorno. Sumamos los cuatro lados: 18,5 + 12 + 18,5 + 12 = 61 metros lineales.",
+          practicalTip: "El perímetro se expresa siempre en unidades lineales simples (metros 'm').",
+        },
+        {
+          stepNumber: 3,
+          title: "Cálculo de la Superficie / Área (piso a pintar)",
+          mathDevelopment: "Fórmula: Superficie = largo · ancho (base · altura)\nÁrea = 18,5 m · 12 m\nÁrea = 222 m² (metros cuadrados)",
+          appliedRule: "Área del Rectángulo: A = b · h",
+          explanation: "El área mide todo el espacio interior del patio multiplicando largo por ancho. Resulta en 222 m².",
+          practicalTip: "La superficie se expresa obligatoriamente en unidades cuadradas (m²).",
+        },
+      ],
+      finalAnswer: "Perímetro para la cinta = 61 metros | Superficie a pintar = 222 m²",
+      pedagogicalTips: [
+        "Insistir en la diferencia conceptual: Perímetro = cinta/borde (metros) vs. Superficie = baldosa/pintura (metros cuadrados).",
+      ],
+      commonPitfalls: [
+        "Confundir las fórmulas y multiplicar los cuatro lados en el perímetro.",
+        "Olvidar colocar el exponente cuadrado (²) en la unidad de superficie.",
+      ],
+      reinforcementConcept: "El perímetro es la suma de las longitudes de los lados; el área es la medida de la región interior.",
+    };
+  }
+
+  // 4. PITÁGORAS
+  if (
+    norm.includes("pitágoras") ||
+    norm.includes("poste") ||
+    norm.includes("sombra") ||
+    norm.includes("hipotenusa") ||
+    norm.includes("cateto")
+  ) {
+    return {
+      problemTitle: "Teorema de Pitágoras y Triángulos Rectángulos",
+      subject: "Matemática",
+      level: cleanLevel,
+      originalProblem: problemText || "Un poste de luz de 6 metros de altura proyecta sobre la vereda una sombra de 4,5 metros. ¿Cuál es la distancia en línea recta desde la punta más alta del poste hasta el extremo de la sombra en el piso?",
+      stepByStep: [
+        {
+          stepNumber: 1,
+          title: "Modelar el triángulo rectángulo e identificar catetos e hipotenusa",
+          mathDevelopment: "Triángulo rectángulo formado:\n• Cateto vertical (altura del poste a) = 6 m\n• Cateto horizontal (longitud de la sombra b) = 4,5 m\n• Hipotenusa (distancia en línea recta H) = ?",
+          appliedRule: "Identificación de Elementos del Triángulo Rectángulo (Ángulo recto de 90° entre poste y piso)",
+          explanation: "El poste vertical forma un ángulo recto (90°) con el suelo horizontal. Los dos lados perpendiculares son los catetos y la distancia buscada es la hipotenusa.",
+          practicalTip: "La hipotenusa es siempre el lado opuesto al ángulo de 90° y es el lado más largo de los tres.",
+        },
+        {
+          stepNumber: 2,
+          title: "Plantear el Teorema de Pitágoras",
+          mathDevelopment: "Teorema: H² = a² + b²\n(Hipotenusa)² = (Cateto 1)² + (Cateto 2)²",
+          appliedRule: "Teorema de Pitágoras: En todo triángulo rectángulo, el cuadrado de la hipotenusa es igual a la suma de los cuadrados de los catetos.",
+          explanation: "Escribimos la fórmula fundamental antes de sustituir con los valores numéricos.",
+          practicalTip: "Anotar la fórmula con letras ayuda a no saltear el paso de elevar al cuadrado.",
+        },
+        {
+          stepNumber: 3,
+          title: "Sustituir datos y calcular los cuadrados de los catetos",
+          mathDevelopment: "H² = (6 m)² + (4,5 m)²\nH² = 36 m² + 20,25 m²\nH² = 56,25 m²",
+          appliedRule: "Potenciación de Números Enteros y Decimales",
+          explanation: "Calculamos 6² = 36 y 4,5² = 20,25. Luego sumamos ambos resultados parciales obteniendo 56,25.",
+          practicalTip: "¡Ojo con 4,5²! Es 4,5 · 4,5 = 20,25 (no es 4,5 · 2 = 9).",
+        },
+        {
+          stepNumber: 4,
+          title: "Aplicar la raíz cuadrada para despejar la distancia H",
+          mathDevelopment: "H = √(56,25 m²)\nH = 7,5 metros",
+          appliedRule: "Operación Inversa de la Potencia (Radicación)",
+          explanation: "Pasamos el exponente cuadrado como raíz cuadrada. La raíz cuadrada de 56,25 es exactamente 7,5 metros.",
+          practicalTip: "Comprobar que 7,5 m es mayor que 6 m y que 4,5 m (la hipotenusa siempre debe ser el lado más largo).",
+        },
+      ],
+      finalAnswer: "Distancia en línea recta desde la punta del poste al extremo de la sombra = 7,5 metros",
+      pedagogicalTips: [
+        "Hacerle dibujar el triángulo con la escuadra y marcar el ángulo recto con un cuadradito.",
+        "Verificar que la hipotenusa siempre sea más larga que cualquiera de los dos catetos.",
+      ],
+      commonPitfalls: [
+        "Sumar 6 + 4,5 = 10,5 sin elevar al cuadrado.",
+        "Olvidar sacar la raíz cuadrada final y dejar H² = 56,25 como respuesta.",
+      ],
+      reinforcementConcept: "En el Teorema de Pitágoras, primero se elevan al cuadrado los catetos, luego se suman y finalmente se extrae la raíz cuadrada.",
+    };
+  }
+
+  // 5. OPERACIONES COMBINADAS CON ENTEROS (Z)
+  if (
+    norm.includes("enteros") ||
+    norm.includes("√49") ||
+    norm.includes("combinadas") ||
+    (norm.includes("-3") && norm.includes("-4") && norm.includes("jerarquía"))
+  ) {
+    return {
+      problemTitle: "Operaciones Combinadas en Números Enteros (Z)",
+      subject: "Matemática",
+      level: cleanLevel,
+      originalProblem: problemText || "Separar en términos y resolver respetando la jerarquía de operaciones: -3 · (-4 + 7) + √49 - (-18) : (-3)² + (-2)³",
+      stepByStep: [
+        {
+          stepNumber: 1,
+          title: "Separar en términos principales",
+          mathDevelopment: "Expresión:\n[-3 · (-4 + 7)] + [√49] - [(-18) : (-3)²] + [(-2)³]\n(Son 4 términos delimitados por los signos + y - principales)",
+          appliedRule: "Jerarquía de Operaciones (Separación en Términos)",
+          explanation: "Separamos en 4 términos independientes que se resolverán en paralelo respetando la prioridad.",
+          practicalTip: "Los signos + y - dentro de paréntesis NO separan términos.",
+        },
+        {
+          stepNumber: 2,
+          title: "Resolver paréntesis, potencias y raíces en cada término",
+          mathDevelopment: "• Término 1: (-4 + 7) = +3  ==>  -3 · (+3)\n• Término 2: √49 = 7\n• Término 3: (-3)² = +9  ==>  -(-18 : 9)\n• Término 4: (-2)³ = -8",
+          appliedRule: "Regla de Signos en Potenciación (Base negativa, exponente par = positivo; impar = negativo)",
+          explanation: "Resolvemos primero las operaciones interiores de los paréntesis, las raíces exactas y las potencias.",
+          practicalTip: "(-3)² = +9 (exponente par da positivo), pero (-2)³ = -8 (exponente impar conserva el signo negativo).",
+        },
+        {
+          stepNumber: 3,
+          title: "Resolver multiplicaciones y divisiones de cada término",
+          mathDevelopment: "• Término 1: -3 · (+3) = -9\n• Término 2: +7\n• Término 3: - (-18 : 9) = - (-2) = +2\n• Término 4: + (-8) = -8",
+          appliedRule: "Regla de los Signos en Multiplicación y División: (-) · (+) = (-)  y  (-) : (+) = (-)",
+          explanation: "Efectuamos el producto y cociente de cada bloque numérico aplicando la regla de los signos.",
+          practicalTip: "Un signo menos delante de un paréntesis le cambia el signo a todo lo de adentro: -(-2) = +2.",
+        },
+        {
+          stepNumber: 4,
+          title: "Suma algebraica final reuniendo positivos y negativos",
+          mathDevelopment: "Suma algebraica: -9 + 7 + 2 - 8\nPositivos: (+7 + 2) = +9\nNegativos: (-9 - 8) = -17\nResultado final: +9 - 17 = -8",
+          appliedRule: "Suma Algebraica de Números Enteros: (Suma de positivos) - (Suma de módulos negativos)",
+          explanation: "Agrupamos los números positivos por un lado (+9) y los negativos por el otro (-17). Al restarlos obtenemos -8.",
+          practicalTip: "Pensalo con dinero: tenés $9 a favor y debés $17, quedás debiendo $8 (-8).",
+        },
+      ],
+      finalAnswer: "Resultado = -8",
+      pedagogicalTips: [
+        "Marcar los arcos de los términos con lápiz arriba de la cuenta.",
+        "Resolver cada término renglón por renglón hacia abajo en el cuaderno.",
+      ],
+      commonPitfalls: [
+        "Hacer -3 · (-4) y luego sumarle 7 sin resolver el paréntesis primero.",
+        "Creer que (-2)³ da +8 por ser negativo.",
+      ],
+      reinforcementConcept: "En operaciones combinadas el orden es: 1° Paréntesis, 2° Potencias y Raíces, 3° Multiplicaciones y Divisiones, 4° Sumas y Restas.",
+    };
+  }
+
+  // 6. PORCENTAJES Y DESCUENTOS / RECARGOS
+  if (
+    norm.includes("porcentaje") ||
+    norm.includes("campera") ||
+    norm.includes("cuota") ||
+    norm.includes("recargo") ||
+    norm.includes("descuento")
+  ) {
+    return {
+      problemTitle: "Porcentajes, Descuentos Comerciales y Recargos en Cuotas",
+      subject: "Matemática",
+      level: cleanLevel,
+      originalProblem: problemText || "Una campera cuesta $45.000 de contado. Si se abona en 3 cuotas fijas con tarjeta de crédito, tiene un recargo del 18%. En cambio, si se paga en efectivo en el local, hacen un descuento del 15%. ¿Cuánto se paga en cada modalidad y cuál es el valor de cada cuota?",
+      stepByStep: [
+        {
+          stepNumber: 1,
+          title: "Opción Tarjeta: Calcular el recargo del 18% y el precio financiado",
+          mathDevelopment: "Precio base: $45.000\nRecargo = 18% de $45.000 = ($45.000 · 18) / 100 = $8.100\n\nPrecio con Tarjeta = $45.000 + $8.100 = $53.100\n(O cálculo directo: $45.000 · 1,18 = $53.100)",
+          appliedRule: "Cálculo de Porcentaje con Recargo: Total = Base · (1 + i)",
+          explanation: "Calculamos el 18% de $45.000 multiplicando por 0,18 ($8.100) y se lo sumamos al precio base para obtener el valor total financiado ($53.100).",
+          practicalTip: "Multiplicar por 1,18 aplica el precio original (1) más el recargo (0,18) en un solo paso.",
+        },
+        {
+          stepNumber: 2,
+          title: "Calcular el valor de cada una de las 3 cuotas fijas",
+          mathDevelopment: "Valor de cada cuota = Precio con Tarjeta / 3\nValor cuota = $53.100 / 3\nValor cuota = $17.700 por mes",
+          appliedRule: "División Uniforme de Importe Financiado",
+          explanation: "Dividimos el total con recargo ($53.100) en 3 partes iguales. Cada cuota mensual será de $17.700.",
+          practicalTip: "Verificar multiplicando: $17.700 · 3 = $53.100 ✓.",
+        },
+        {
+          stepNumber: 3,
+          title: "Opción Efectivo: Calcular el descuento del 15% y el precio final",
+          mathDevelopment: "Precio base: $45.000\nDescuento = 15% de $45.000 = ($45.000 · 15) / 100 = $6.750\n\nPrecio Efectivo = $45.000 - $6.750 = $38.250\n(O cálculo directo: $45.000 · 0,85 = $38.250)",
+          appliedRule: "Cálculo de Porcentaje con Descuento: Total = Base · (1 - d)",
+          explanation: "Calculamos el 15% de $45.000 ($6.750) y se lo restamos al valor base. El pago al contado en efectivo queda en $38.250.",
+          practicalTip: "Si te descuentan el 15%, pagás el 85% del valor (45.000 · 0,85 = 38.250).",
+        },
+      ],
+      finalAnswer: "1) Con tarjeta en 3 cuotas: Total $53.100 (3 cuotas fijas de $17.700 c/u). 2) En efectivo con 15% de descuento: Total $38.250 (Ahorro de $6.750).",
+      pedagogicalTips: [
+        "Enseñar los dos caminos: calcular el monto del porcentaje y luego sumar/restar, o usar el coeficiente multiplicador (1,18 / 0,85).",
+      ],
+      commonPitfalls: [
+        "Dividir por 3 antes de sumar el recargo del 18%.",
+        "Sumar el porcentaje en lugar de restarlo en el caso del descuento en efectivo.",
+      ],
+      reinforcementConcept: "Un recargo incrementa el valor base (Base + %); un descuento lo disminuye (Base - %).",
+    };
+  }
+
+  // 7. LENGUA Y LITERATURA / PRÁCTICAS DEL LENGUAJE
+  if (cleanSubject.includes("Lengua") || cleanSubject.includes("Prácticas del Lenguaje") || norm.includes("sintáctic") || norm.includes("sujeto") || norm.includes("acentuación") || norm.includes("agudas")) {
+    if (norm.includes("acentuación") || norm.includes("aguda") || norm.includes("grave") || norm.includes("esdrújula")) {
+      return {
+        problemTitle: "Reglas de Acentuación y Clasificación de Palabras",
+        subject: "Prácticas del Lenguaje",
+        level: cleanLevel,
+        originalProblem: problemText || "Clasificar las siguientes palabras según su acentuación (aguda, grave o esdrújula) y justificar por qué llevan o no tilde gráfica: canción, árbol, cuaderno, pájaro, examen, exámenes, corazón.",
+        stepByStep: [
+          {
+            stepNumber: 1,
+            title: "Separar en sílabas e identificar la sílaba tónica (fuerte)",
+            mathDevelopment: "• can-CIÓN: sílaba tónica 'CIÓN' (última)\n• ÁR-bol: sílaba tónica 'ÁR' (penúltima)\n• cua-DER-no: sílaba tónica 'DER' (penúltima)\n• PÁ-ja-ro: sílaba tónica 'PÁ' (antepenúltima)\n• ex-A-men: sílaba tónica 'A' (penúltima)\n• ex-Á-me-nes: sílaba tónica 'Á' (antepenúltima)\n• co-ra-ZÓN: sílaba tónica 'ZÓN' (última)",
+            appliedRule: "Identificación de Sílaba Tónica y Separación Silábica",
+            explanation: "Pronunciamos cada palabra para ubicar la sílaba que recibe el golpe de voz principal.",
+            practicalTip: "Hacer palmadas o exagerar la pronunciación para ubicar la sílaba tónica sin dudar.",
+          },
+          {
+            stepNumber: 2,
+            title: "Clasificar y justificar según las reglas de tildación",
+            mathDevelopment: "1. Canción / Corazón: AGUDAS con tilde porque terminan en 'N'.\n2. Árbol: GRAVE con tilde porque termina en 'L' (consonante distinta de N o S).\n3. Cuaderno / Examen: GRAVES sin tilde porque terminan en vocal / 'N'.\n4. Pájaro / Exámenes: ESDRÚJULAS con tilde porque todas las esdrújulas llevan tilde siempre.",
+            appliedRule: "Reglas Generales de Acentuación (RAE / PBA)",
+            explanation: "Aplicamos la regla: Agudas (N, S o vocal), Graves (no N, no S, no vocal) y Esdrújulas (siempre).",
+            practicalTip: "Regla mnemotécnica SEGA: Sobreesdrújulas, Esdrújulas, Graves, Agudas.",
+          },
+        ],
+        finalAnswer: "Canción (Aguda c/tilde), Árbol (Grave c/tilde), Cuaderno (Grave s/tilde), Pájaro (Esdrújula c/tilde), Examen (Grave s/tilde), Exámenes (Esdrújula c/tilde), Corazón (Aguda c/tilde).",
+        pedagogicalTips: [
+          "Explicar el caso típico de 'examen' (grave sin tilde) vs. 'exámenes' (esdrújula con tilde obligatoria).",
+        ],
+        commonPitfalls: [
+          "Ponerle tilde a 'examen' por creer que sigue la regla de 'canción'.",
+        ],
+        reinforcementConcept: "La posición de la sílaba tónica determina si la palabra es aguda, grave o esdrújula.",
+      };
+    }
+
     return {
       problemTitle: "Análisis Sintáctico y Morfológico Didáctico",
       subject: "Prácticas del Lenguaje",
       level: cleanLevel,
-      originalProblem: problemText || "Los alumnos aplicados de Patricia resolvieron la guía escolar con entusiasmo.",
+      originalProblem: problemText || "Ayer por la tarde, los entusiastas alumnos de Patricia resolvieron la guía escolar con entusiasmo.",
       stepByStep: [
         {
           stepNumber: 1,
           title: "Identificar el verbo conjugado (Núcleo Verbal)",
-          mathDevelopment: "Oración: [Los alumnos aplicados de Patricia resolvieron la guía escolar con entusiasmo.]\n==> Verbo conjugado: 'resolvieron' (Núcleo Verbal - NV)",
+          mathDevelopment: "Oración: [Ayer por la tarde, los entusiastas alumnos de Patricia resolvieron la guía escolar con entusiasmo.]\n==> Verbo conjugado: 'resolvieron' (Núcleo Verbal - NV)",
           appliedRule: "Regla del Núcleo Verbal y Concordancia de Persona/Número",
           explanation: "Buscamos la acción principal conjugada que concuerda en 3ra persona del plural con quienes realizan la acción.",
           practicalTip: "Preguntale al verbo '¿Quiénes resolvieron?' para delimitar el Sujeto con total seguridad.",
@@ -283,7 +738,7 @@ function generateFallbackSolution(problemText: string, subject: string, level: s
         {
           stepNumber: 2,
           title: "Delimitar Sujeto y Predicado",
-          mathDevelopment: "Sujeto: [Los alumnos aplicados de Patricia] (S.E.S.)\nPredicado: [resolvieron la guía escolar con entusiasmo] (P.V.S.)",
+          mathDevelopment: "Sujeto: [Los entusiastas alumnos de Patricia] (S.E.S.)\nPredicado: [Ayer por la tarde, ... resolvieron la guía escolar con entusiasmo] (P.V.S.)",
           appliedRule: "Estructura Bimembre (Sujeto Expreso Simple + Predicado Verbal Simple)",
           explanation: "Separamos la oración en dos miembros principales: de quién se habla (Sujeto) y la acción que se predica (Predicado).",
           practicalTip: "Si el sujeto no estuviese escrito explícitamente pero se deduce del verbo, se indicaría como Sujeto Tácito (S.T.).",
@@ -291,7 +746,7 @@ function generateFallbackSolution(problemText: string, subject: string, level: s
         {
           stepNumber: 3,
           title: "Analizar los modificadores internos del Sujeto",
-          mathDevelopment: "• 'Los' = Modificador Directo (MD, artículo)\n• 'alumnos' = Núcleo Sustantivo (N)\n• 'aplicados' = Modificador Directo (MD, adjetivo)\n• 'de Patricia' = Modificador Indirecto (MI, encabezado por 'de')",
+          mathDevelopment: "• 'Los' = Modificador Directo (MD, artículo)\n• 'entusiastas' = Modificador Directo (MD, adjetivo)\n• 'alumnos' = Núcleo Sustantivo (N)\n• 'de Patricia' = Modificador Indirecto (MI, encabezado por 'de')",
           appliedRule: "Modificadores del Sustantivo (MD directo / MI con preposición + término)",
           explanation: "Los artículos y adjetivos pegados al sustantivo son MD. Las construcciones con preposición ('de Patricia') forman un MI.",
           practicalTip: "Los Modificadores Directos concuerdan obligatoriamente en género y número con el sustantivo núcleo.",
@@ -299,36 +754,26 @@ function generateFallbackSolution(problemText: string, subject: string, level: s
         {
           stepNumber: 4,
           title: "Analizar los modificadores del Predicado",
-          mathDevelopment: "• 'resolvieron' = NV\n• 'la guía escolar' = Objeto Directo (OD) ==> Prueba: 'la resolvieron'\n• 'con entusiasmo' = Circunstancial de Modo (C. Modo) ==> ¿Cómo resolvieron?",
+          mathDevelopment: "• 'Ayer por la tarde' = Circunstancial de Tiempo (CCTiempo)\n• 'resolvieron' = NV\n• 'la guía escolar' = Objeto Directo (OD) ==> Prueba: 'la resolvieron'\n• 'con entusiasmo' = Circunstancial de Modo (CCModo)",
           appliedRule: "Objetos del Verbo (Prueba de pronominalización de OD / Pregunta de Circunstancial)",
-          explanation: "El Objeto Directo recibe la acción directa y se puede reemplazar por 'la'. 'Con entusiasmo' responde a ¿cómo? y es C. de Modo.",
+          explanation: "El Objeto Directo recibe la acción directa y se puede reemplazar por 'la'. 'Ayer por la tarde' responde a ¿cuándo? y 'con entusiasmo' a ¿cómo?.",
           practicalTip: "Para confirmar el OD, hacé la prueba del pase a Voz Pasiva: 'La guía escolar fue resuelta por los alumnos'.",
         },
-        {
-          stepNumber: 5,
-          title: "Cierre, corchetes y tipificación final",
-          mathDevelopment: "[Los (MD) alumnos (N) aplicados (MD) de Patricia (MI)] S.E.S. [resolvieron (NV) la guía escolar (OD) con entusiasmo (C.Modo)] P.V.S.  ==> O.B.",
-          appliedRule: "Sintaxis Bimembre Completa (O.B.)",
-          explanation: "Verificamos que todos los sintagmas tengan su función asignada y cerramos con corchetes la Oración Bimembre (O.B.).",
-          practicalTip: "Revisá que no quede ninguna palabra suelta sin analizar ni flecha sin conectar.",
-        },
       ],
-      finalAnswer: "Oración Bimembre (O.B.) analizada con Sujeto Expreso Simple (S.E.S.), Predicado Verbal Simple (P.V.S.), OD y C. de Modo.",
+      finalAnswer: "Oración Bimembre (O.B.) con Sujeto Expreso Simple (S.E.S.), Predicado Verbal Simple (P.V.S.), OD, CCTiempo y CCModo.",
       pedagogicalTips: [
         "Recordale al alumno que el Núcleo del Sujeto siempre es un sustantivo o pronombre, mientras que el Núcleo del Predicado es el verbo conjugado.",
         "Hacerle subrayar con colores diferentes el Sujeto (azul) y el Predicado (rojo) para ordenar visualmente la hoja.",
-        "Para los circunstanciales, asociar preguntas clave: ¿Dónde? (Lugar), ¿Cuándo? (Tiempo), ¿Cómo? (Modo).",
       ],
       commonPitfalls: [
-        "Confundir el Modificador Directo (adjetivo/artículo) con el Modificador Indirecto (empieza con preposición 'de, con, en').",
-        "Confundir un Objeto Directo con un Circunstancial de Modo o Cantidad.",
-        "Olvidar señalar el Sujeto Tácito cuando el sujeto no está escrito de forma explícita.",
+        "Confundir el Modificador Directo (adjetivo/artículo) con el Modificador Indirecto (empieza con preposición).",
       ],
       reinforcementConcept: "Concordancia obligatoria entre el Núcleo del Sujeto y el Núcleo Verbal en persona y número.",
     };
   }
 
-  if (cleanSubject.includes("Física")) {
+  // 8. FÍSICA
+  if (cleanSubject.includes("Física") || norm.includes("mru") || norm.includes("velocidad") || norm.includes("newton")) {
     return {
       problemTitle: "Resolución Cinemática / Dinámica (Física)",
       subject: "Física",
@@ -341,47 +786,38 @@ function generateFallbackSolution(problemText: string, subject: string, level: s
           mathDevelopment: "• Velocidad (v) = 72 km/h\n• Tiempo (t) = 25 s\n• Posición inicial (x₀) = 0 m\n• Incógnita: Distancia recorrida (x) = ? [en metros]",
           appliedRule: "Planteo de Magnitudes del Sistema Internacional (SI)",
           explanation: "Anotamos en una columna lateral todos los valores conocidos y la incógnita a despejar con sus respectivas unidades.",
-          practicalTip: "Anotar siempre las unidades para no mezclar magnitudes (ej: km/h con m/s o minutos con horas).",
+          practicalTip: "Anotar siempre las unidades para no mezclar magnitudes.",
         },
         {
           stepNumber: 2,
           title: "Conversión y homogeneización de unidades (km/h a m/s)",
           mathDevelopment: "v = 72 km/h = (72 / 3,6) m/s = 20 m/s\n==> v = 20 m/s",
           appliedRule: "Factor de Conversión de Velocidad (1 km/h = 1000m / 3600s = 1/3,6 m/s)",
-          explanation: "El tiempo está expresado en segundos, por lo que convertimos la velocidad a metros por segundo (m/s) dividiendo por 3,6.",
-          practicalTip: "Regla mnemotécnica: De km/h a m/s se DIVIDE por 3,6. De m/s a km/h se MULTIPLICA por 3,6.",
+          explanation: "Convertimos la velocidad a metros por segundo (m/s) dividiendo por 3,6.",
+          practicalTip: "De km/h a m/s se DIVIDE por 3,6. De m/s a km/h se MULTIPLICA por 3,6.",
         },
         {
           stepNumber: 3,
           title: "Selección de la ecuación horaria de MRU",
-          mathDevelopment: "Ecuación: x(t) = x₀ + v · t\nComo x₀ = 0 m ==> x = v · t",
+          mathDevelopment: "Ecuación: x(t) = x₀ + v · t\nComo x₀ = 0 m ==> x = v · t\nx = 20 m/s · 25 s = 500 m",
           appliedRule: "Ecuación Horaria del Movimiento Rectilíneo Uniforme (MRU)",
           explanation: "Al tratarse de una velocidad constante sin aceleración, la distancia es directamente proporcional al producto de la velocidad por el tiempo.",
           practicalTip: "Despejar la incógnita de forma algebraica antes de reemplazar con números.",
         },
-        {
-          stepNumber: 4,
-          title: "Cálculo algebraico y simplificación de unidades",
-          mathDevelopment: "x = 20 (m/s) · 25 s\nx = (20 · 25) · (m · s / s)\nx = 500 m",
-          appliedRule: "Análisis Dimensional y Cancelación de Unidades",
-          explanation: "Multiplicamos 20 por 25 y simplificamos los segundos (s) en el numerador y denominador, obteniendo el resultado en metros (m).",
-          practicalTip: "Preguntarse siempre: ¿El resultado tiene sentido en la vida real? 500 metros en 25 s a 72 km/h es físicamente consistente.",
-        },
       ],
       finalAnswer: "Distancia recorrida = 500 metros (x = 500 m)",
       pedagogicalTips: [
-        "Enseñar al alumno a realizar un esquema gráfico o dibujo con el sistema de referencia y el sentido positivo.",
-        "Hacer análisis dimensional cancelando unidades en el papel para evitar errores de cálculo.",
+        "Enseñar al alumno a realizar un esquema gráfico con el sistema de referencia.",
       ],
       commonPitfalls: [
         "Multiplicar directamente 72 km/h × 25 s sin convertir unidades previamente.",
-        "Olvidar colocar la unidad de medida (m) en el resultado final.",
       ],
       reinforcementConcept: "En todo problema de física, las magnitudes deben estar en unidades homogéneas (SI: metros y segundos).",
     };
   }
 
-  if (cleanSubject.includes("Química")) {
+  // 9. QUÍMICA
+  if (cleanSubject.includes("Química") || norm.includes("lewis") || norm.includes("union") || norm.includes("molar")) {
     return {
       problemTitle: "Estructura Química, Uniones y Lewis",
       subject: "Química",
@@ -391,10 +827,10 @@ function generateFallbackSolution(problemText: string, subject: string, level: s
         {
           stepNumber: 1,
           title: "Ubicación en la Tabla Periódica y Electrones de Valencia",
-          mathDevelopment: "• Carbono (C): Grupo 14 (IV A) ==> 4 electrones de valencia (4 e⁻)\n• Oxígeno (O): Grupo 16 (VI A) ==> 6 electrones de valencia (6 e⁻)\n• Total e⁻ de valencia = 4 + 2·(6) = 16 e⁻",
+          mathDevelopment: "• Carbono (C): Grupo 14 ==> 4 electrones de valencia (4 e⁻)\n• Oxígeno (O): Grupo 16 ==> 6 electrones de valencia (6 e⁻)\n• Total e⁻ de valencia = 4 + 2·(6) = 16 e⁻",
           appliedRule: "Configuración Electrónica de Valencia según Grupo",
           explanation: "Identificamos los electrones del último nivel energético para cada átomo participante de la molécula.",
-          practicalTip: "El número de grupo representativo indica directamente cuántos puntos o cruces dibujar en Lewis.",
+          practicalTip: "El número de grupo representativo indica directamente cuántos puntos dibujar en Lewis.",
         },
         {
           stepNumber: 2,
@@ -402,7 +838,7 @@ function generateFallbackSolution(problemText: string, subject: string, level: s
           mathDevelopment: "Carbono (No Metal) + Oxígeno (No Metal)\nΔEN = 3,44 - 2,55 = 0,89 (< 1,7)\n==> Unión Covalente (se comparten pares de e⁻)",
           appliedRule: "Criterio de Electronegatividad (No Metal + No Metal = Covalente)",
           explanation: "Al ser dos no metales, ninguno cede electrones de forma total, sino que comparten pares de electrones para completar sus octetos.",
-          practicalTip: "Los metales ceden e⁻ formando uniones iónicas; dos no metales siempre forman uniones covalentes.",
+          practicalTip: "Los metales ceden e⁻ formando uniones iónicas; dos no metales forman uniones covalentes.",
         },
         {
           stepNumber: 3,
@@ -410,31 +846,21 @@ function generateFallbackSolution(problemText: string, subject: string, level: s
           mathDevelopment: "Disposición: O = C = O\n• Cada enlace doble (=) comparte 2 pares de e⁻ (4 e⁻ compartidos por cada O).\n• El Carbono central completa 8 e⁻ (4 pares enlazantes).\n• Cada Oxígeno completa 8 e⁻ (2 pares enlazantes + 2 pares libres).",
           appliedRule: "Regla del Octeto de Lewis (8 electrones de valencia por átomo)",
           explanation: "El carbono comparte dos pares de electrones con cada oxígeno, formando dos enlaces covalentes dobles.",
-          practicalTip: "El átomo con menor electronegatividad o mayor capacidad de enlace (Carbono) se coloca siempre en el centro.",
-        },
-        {
-          stepNumber: 4,
-          title: "Fórmula Desarrollada y Geometría Molecular",
-          mathDevelopment: "Fórmula desarrollada: O = C = O (Lineal, ángulo de 180°)\nFórmula molecular: CO₂",
-          appliedRule: "Geometría Molecular Lineal y Neutralidad",
-          explanation: "La molécula adopta una geometría lineal simétrica con dos dobles enlaces covalentes.",
-          practicalTip: "Verificar que la suma de cargas sea cero y que todos los átomos cumplan el octeto.",
+          practicalTip: "El átomo con menor electronegatividad (Carbono) se coloca en el centro.",
         },
       ],
-      finalAnswer: "Unión Covalente Doble No Polar. Estructura lineal O = C = O con todos los octetos completos.",
+      finalAnswer: "Unión Covalente Doble No Polar: O = C = O con todos los octetos completos.",
       pedagogicalTips: [
         "Utilizar colores distintos para los electrones de cada elemento al graficar en el cuaderno.",
-        "Asociar los enlaces covalentes dobles a los 2 electrones que le faltaban al oxígeno para llegar a 8.",
       ],
       commonPitfalls: [
-        "Poner corchetes con cargas en uniones covalentes (los corchetes son solo para compuestos iónicos).",
-        "Olvidar dibujar los dos pares de electrones libres sobre cada átomo de oxígeno.",
+        "Poner corchetes con cargas en uniones covalentes.",
       ],
-      reinforcementConcept: "La regla del octeto impulsa a los átomos a enlazarse para adquirir la configuración electrónica estable del gas noble.",
+      reinforcementConcept: "La regla del octeto impulsa a los átomos a adquirir la configuración electrónica estable del gas noble.",
     };
   }
 
-  // Default Matemática (Ecuaciones y Fracciones)
+  // 10. DEFAULT MATEMÁTICA (ECUACIÓN DE PRIMER GRADO)
   return {
     problemTitle: "Resolución Didáctica Paso a Paso (Pizarrón)",
     subject: "Matemática",
@@ -946,11 +1372,15 @@ app.post("/api/solve-problem", async (req, res) => {
 Tu rol es asistir a la docente y maestra particular Patricia Morinigo para que pueda explicar y resolver ejercicios con máxima claridad, calidez, rigor matemático/didáctico y exactitud numérica.
 Usa terminología escolar argentina adecuada (ej: "denominador común", "simplificación", "sujeto tácito", "modificador directo", "MRU", "ecuaciones de primer grado", "regla de tres simple", "uniones iónicas/covalentes").
 
-REQUISITO ESTRUCTURAL OBLIGATORIO:
-1. 'originalProblem': Debe contener el enunciado completo y limpio del problema a resolver.
-2. Cada paso en 'stepByStep' DEBE estructurarse de forma dual y complementaria:
-   - 'mathDevelopment': El desarrollo numérico/algebraico/práctico REAL renglón a renglón con los números y operaciones exactas del ejercicio (como en el pizarrón o cuaderno del alumno). Muestra las ecuaciones con números, sustitución de valores, simplificaciones intermedias y despejes reales. En Lengua, muestra la oración con la marcación sintáctica.
-   - 'appliedRule': El nombre formal de la regla matemática, ley física, propiedad algebraica o regla gramatical aplicada en ese paso exacto (ej: 'Propiedad distributiva del producto respecto a la resta', 'Regla de los signos en la multiplicación', 'Factor común', '2da Ley de Newton (F = m·a)', 'Mínimo Común Múltiplo (mcm)', 'Concordancia entre Sujeto y Verbo').
+REQUISITOS PEDAGÓGICOS CRÍTICOS:
+1. FIDELIDAD TOTAL AL ENUNCIADO: Resuelve ESTRICTAMENTE el problema solicitado por el usuario con sus datos exactos.
+   - Si el problema es de "Regla de Tres Simple" o proporcionalidad (ej: alfajores, paquetes de harina, obreros, precios), NO desarrolles una ecuación abstracta genérica de "despejar x"; en su lugar, organiza las magnitudes, clasifica si es Directa o Inversa, calcula la constante unitaria (k) y desarrolla los cálculos exactos y cruzados de la regla de tres.
+   - Si el problema es de fracciones o compras en la verdulería, calcula los importes parciales, el total y el vuelto exacto.
+   - Si el problema es de geometría o Pitágoras, haz el cálculo de perímetro/área o hipotenusa con sus unidades de medida.
+2. 'originalProblem': Debe contener el enunciado completo y limpio del problema a resolver.
+3. Cada paso en 'stepByStep' DEBE estructurarse de forma dual y complementaria:
+   - 'mathDevelopment': El desarrollo numérico/algebraico/práctico REAL renglón a renglón con los números y operaciones exactas del ejercicio (como en el pizarrón o cuaderno del alumno). Muestra las operaciones con números, sustitución de valores, simplificaciones intermedias y planteos reales. En Lengua, muestra la oración con la marcación sintáctica.
+   - 'appliedRule': El nombre formal de la regla matemática, ley física, propiedad algebraica o regla gramatical aplicada en ese paso exacto (ej: 'Planteo de Regla de Tres Simple Directa', 'Propiedad distributiva', 'Regla de los signos', 'Teorema de Pitágoras', 'Factor común', 'Concordancia entre Sujeto y Verbo').
    - 'explanation': La explicación pedagógica clara y amigable de qué se hizo en ese renglón.
    - 'practicalTip': Tip mnemotécnico o advertencia didáctica de la profe Patricia para no equivocarse.`;
 
@@ -1056,6 +1486,84 @@ Por favor, resuelve el problema desglosándolo didácticamente con el desarrollo
     console.error("Error calling Gemini in /api/solve-problem, falling back:", error);
     const fallback = generateFallbackSolution(problemText, subject, level);
     res.json(fallback);
+  }
+});
+
+// 2b. Generate a tailored single exercise from a specific topic query
+app.post("/api/generate-sample-exercise", async (req, res) => {
+  const { topic, subject = "Matemática", level = "Secundaria Básica (1° a 3° año)", difficulty = "Intermedio" } = req.body;
+  if (!topic || typeof topic !== "string" || !topic.trim()) {
+    return res.status(400).json({ error: "Debe especificar un tema para generar el ejercicio." });
+  }
+
+  const cleanTopic = topic.trim();
+  const ai = getAIClient();
+
+  if (!ai) {
+    return res.json({
+      id: `gen_${Date.now()}`,
+      label: `Ejercicio sobre ${cleanTopic}`,
+      topic: cleanTopic,
+      subject,
+      level,
+      difficulty,
+      text: `Resolver el siguiente ejercicio de práctica sobre ${cleanTopic} para nivel ${level}: Desarrollar paso a paso, indicar las fórmulas y leyes aplicadas en cada renglón y verificar el resultado final.`,
+    });
+  }
+
+  try {
+    const prompt = `Eres una docente y especialista en didáctica de la educación argentina (Provincia de Buenos Aires).
+Crea UN (1) ejercicio escolar concreto, verosímil y didáctico para la profesora particular Patricia Morinigo sobre el tema específico: "${cleanTopic}".
+Materia: ${subject}
+Nivel escolar: ${level}
+Dificultad: ${difficulty}
+
+Requisitos:
+1. 'label': Título breve y claro del ejercicio (máx 6-8 palabras, ej: 'Teorema de Tales en triángulos' o 'MRUV: Frenado en autopista').
+2. 'topic': El nombre formal del tema pedagógico.
+3. 'text': El enunciado completo, detallado y listo para resolver en clase o examen, con datos numéricos realistas o texto para análisis sintáctico. Debe ser directo y claro para el alumno.
+4. Devuelve ESTRICTAMENTE un JSON con:
+{
+  "label": string,
+  "topic": string,
+  "subject": string,
+  "level": string,
+  "difficulty": "Básico" | "Intermedio" | "Avanzado",
+  "text": string
+}`;
+
+    const response = await generateContentWithRetry(ai, {
+      model: "gemini-3.7-flash",
+      contents: [{ text: prompt }],
+      config: {
+        temperature: 0.3,
+        responseMimeType: "application/json",
+      },
+    });
+
+    const parsed = cleanAndParseJSON(response.text || "{}");
+    const result = {
+      id: `gen_${Date.now()}`,
+      label: parsed.label || `Ejercicio sobre ${cleanTopic}`,
+      topic: parsed.topic || cleanTopic,
+      subject: parsed.subject || subject,
+      level: parsed.level || level,
+      difficulty: parsed.difficulty || difficulty,
+      text: parsed.text || `Resolver paso a paso el problema sobre ${cleanTopic} aplicando las propiedades correspondientes y verificando el resultado.`,
+    };
+
+    res.json(result);
+  } catch (error) {
+    console.error("Error in /api/generate-sample-exercise:", error);
+    res.json({
+      id: `gen_${Date.now()}`,
+      label: `Ejercicio sobre ${cleanTopic}`,
+      topic: cleanTopic,
+      subject,
+      level,
+      difficulty,
+      text: `Plantear y resolver paso a paso el siguiente ejercicio sobre ${cleanTopic} adaptado a ${subject} (${level}): Desarrollar las operaciones con precisión y verificar la respuesta final.`,
+    });
   }
 });
 
