@@ -263,44 +263,57 @@ function generateFallbackConceptExplanation(subject: string, topic: string, leve
 function generateFallbackSolution(problemText: string, subject: string, level: string): any {
   const cleanSubject = subject || "Matemática";
   const cleanLevel = level || "Secundaria";
+  const norm = (problemText || "").toLowerCase();
 
   if (cleanSubject.includes("Lengua") || cleanSubject.includes("Prácticas del Lenguaje")) {
     return {
-      problemTitle: "Análisis Sintáctico y Morfológico",
+      problemTitle: "Análisis Sintáctico y Morfológico Didáctico",
       subject: "Prácticas del Lenguaje",
       level: cleanLevel,
-      originalProblem: problemText || "Análisis de oración gramatical",
+      originalProblem: problemText || "Los alumnos aplicados de Patricia resolvieron la guía escolar con entusiasmo.",
       stepByStep: [
         {
           stepNumber: 1,
           title: "Identificar el verbo conjugado (Núcleo Verbal)",
-          explanation: "Buscamos la acción principal de la oración que concuerda en persona y número con el sujeto.",
-          detailOrFormula: "NV: Verbo conjugado principal",
-          practicalTip: "Preguntale al verbo '¿Quién o quiénes realizan la acción?' para hallar el Sujeto con total seguridad.",
+          mathDevelopment: "Oración: [Los alumnos aplicados de Patricia resolvieron la guía escolar con entusiasmo.]\n==> Verbo conjugado: 'resolvieron' (Núcleo Verbal - NV)",
+          appliedRule: "Regla del Núcleo Verbal y Concordancia de Persona/Número",
+          explanation: "Buscamos la acción principal conjugada que concuerda en 3ra persona del plural con quienes realizan la acción.",
+          practicalTip: "Preguntale al verbo '¿Quiénes resolvieron?' para delimitar el Sujeto con total seguridad.",
         },
         {
           stepNumber: 2,
           title: "Delimitar Sujeto y Predicado",
-          explanation: "Separamos la oración en Sujeto (Expreso Simple/Compuesto o Tácito) y Predicado Verbal (Simple o Compuesto).",
-          detailOrFormula: "[ (Sujeto) / (Predicado) ] O.B. (Oración Bimembre)",
-          practicalTip: "Si el sujeto no está escrito pero se deduce del verbo, es Sujeto Tácito (S.T.).",
+          mathDevelopment: "Sujeto: [Los alumnos aplicados de Patricia] (S.E.S.)\nPredicado: [resolvieron la guía escolar con entusiasmo] (P.V.S.)",
+          appliedRule: "Estructura Bimembre (Sujeto Expreso Simple + Predicado Verbal Simple)",
+          explanation: "Separamos la oración en dos miembros principales: de quién se habla (Sujeto) y la acción que se predica (Predicado).",
+          practicalTip: "Si el sujeto no estuviese escrito explícitamente pero se deduce del verbo, se indicaría como Sujeto Tácito (S.T.).",
         },
         {
           stepNumber: 3,
-          title: "Analizar los modificadores internos",
-          explanation: "En el sujeto marcamos Núcleo (N), Modificador Directo (MD), Modificador Indirecto (MI) o Aposición. En el predicado marcamos Objeto Directo (OD), Objeto Indirecto (OI) y Circunstanciales (C. de Tiempo, Lugar, Modo, etc.).",
-          detailOrFormula: "OD: Reemplazable por 'lo, la, los, las' | OI: Reemplazable por 'le, les'",
-          practicalTip: "Para el OD hacele la prueba del pase a Voz Pasiva: el OD pasa a ser Sujeto Paciente.",
+          title: "Analizar los modificadores internos del Sujeto",
+          mathDevelopment: "• 'Los' = Modificador Directo (MD, artículo)\n• 'alumnos' = Núcleo Sustantivo (N)\n• 'aplicados' = Modificador Directo (MD, adjetivo)\n• 'de Patricia' = Modificador Indirecto (MI, encabezado por 'de')",
+          appliedRule: "Modificadores del Sustantivo (MD directo / MI con preposición + término)",
+          explanation: "Los artículos y adjetivos pegados al sustantivo son MD. Las construcciones con preposición ('de Patricia') forman un MI.",
+          practicalTip: "Los Modificadores Directos concuerdan obligatoriamente en género y número con el sustantivo núcleo.",
         },
         {
           stepNumber: 4,
-          title: "Cierre y tipificación de la oración",
+          title: "Analizar los modificadores del Predicado",
+          mathDevelopment: "• 'resolvieron' = NV\n• 'la guía escolar' = Objeto Directo (OD) ==> Prueba: 'la resolvieron'\n• 'con entusiasmo' = Circunstancial de Modo (C. Modo) ==> ¿Cómo resolvieron?",
+          appliedRule: "Objetos del Verbo (Prueba de pronominalización de OD / Pregunta de Circunstancial)",
+          explanation: "El Objeto Directo recibe la acción directa y se puede reemplazar por 'la'. 'Con entusiasmo' responde a ¿cómo? y es C. de Modo.",
+          practicalTip: "Para confirmar el OD, hacé la prueba del pase a Voz Pasiva: 'La guía escolar fue resuelta por los alumnos'.",
+        },
+        {
+          stepNumber: 5,
+          title: "Cierre, corchetes y tipificación final",
+          mathDevelopment: "[Los (MD) alumnos (N) aplicados (MD) de Patricia (MI)] S.E.S. [resolvieron (NV) la guía escolar (OD) con entusiasmo (C.Modo)] P.V.S.  ==> O.B.",
+          appliedRule: "Sintaxis Bimembre Completa (O.B.)",
           explanation: "Verificamos que todos los sintagmas tengan su función asignada y cerramos con corchetes la Oración Bimembre (O.B.).",
-          detailOrFormula: "[ ... ] O.B. / S.E.S. + P.V.S.",
-          practicalTip: "Revisá que no quede ninguna palabra sin analizar ni flecha sin conectar.",
+          practicalTip: "Revisá que no quede ninguna palabra suelta sin analizar ni flecha sin conectar.",
         },
       ],
-      finalAnswer: "Oración Bimembre (O.B.) con Sujeto Expreso Simple (S.E.S.) y Predicado Verbal Simple (P.V.S.), analizada correctamente con sus modificadores directos e indirectos.",
+      finalAnswer: "Oración Bimembre (O.B.) analizada con Sujeto Expreso Simple (S.E.S.), Predicado Verbal Simple (P.V.S.), OD y C. de Modo.",
       pedagogicalTips: [
         "Recordale al alumno que el Núcleo del Sujeto siempre es un sustantivo o pronombre, mientras que el Núcleo del Predicado es el verbo conjugado.",
         "Hacerle subrayar con colores diferentes el Sujeto (azul) y el Predicado (rojo) para ordenar visualmente la hoja.",
@@ -320,154 +333,167 @@ function generateFallbackSolution(problemText: string, subject: string, level: s
       problemTitle: "Resolución Cinemática / Dinámica (Física)",
       subject: "Física",
       level: cleanLevel,
-      originalProblem: problemText || "Problema de física aplicada",
+      originalProblem: problemText || "Un móvil viaja a velocidad constante de 72 km/h durante 25 segundos. Calcular la distancia recorrida en metros.",
       stepByStep: [
         {
           stepNumber: 1,
           title: "Extracción e identificación de Datos e Incógnitas",
-          explanation: "Anotamos en una columna lateral todos los valores numéricos con sus unidades correspondientes del Sistema Internacional (SI).",
-          detailOrFormula: "Datos: Posición inicial (x₀), Velocidad (v), Tiempo (t) | Incógnita: Distancia total (x)",
-          practicalTip: "Anotar siempre las unidades para no confundir magnitudes (ej: km/h con m/s).",
+          mathDevelopment: "• Velocidad (v) = 72 km/h\n• Tiempo (t) = 25 s\n• Posición inicial (x₀) = 0 m\n• Incógnita: Distancia recorrida (x) = ? [en metros]",
+          appliedRule: "Planteo de Magnitudes del Sistema Internacional (SI)",
+          explanation: "Anotamos en una columna lateral todos los valores conocidos y la incógnita a despejar con sus respectivas unidades.",
+          practicalTip: "Anotar siempre las unidades para no mezclar magnitudes (ej: km/h con m/s o minutos con horas).",
         },
         {
           stepNumber: 2,
-          title: "Conversión y homogeneización de unidades",
-          explanation: "Si tenemos velocidades en km/h y tiempos en segundos, convertimos dividiendo por 3,6 para pasar a m/s.",
-          detailOrFormula: "1 km/h = (1000 m / 3600 s) = 1 / 3,6 m/s",
+          title: "Conversión y homogeneización de unidades (km/h a m/s)",
+          mathDevelopment: "v = 72 km/h = (72 / 3,6) m/s = 20 m/s\n==> v = 20 m/s",
+          appliedRule: "Factor de Conversión de Velocidad (1 km/h = 1000m / 3600s = 1/3,6 m/s)",
+          explanation: "El tiempo está expresado en segundos, por lo que convertimos la velocidad a metros por segundo (m/s) dividiendo por 3,6.",
           practicalTip: "Regla mnemotécnica: De km/h a m/s se DIVIDE por 3,6. De m/s a km/h se MULTIPLICA por 3,6.",
         },
         {
           stepNumber: 3,
-          title: "Selección de la ecuación horaria o ley física",
-          explanation: "Aplicamos la ecuación correspondiente al movimiento uniforme o acelerado.",
-          detailOrFormula: "MRU: x(t) = x₀ + v · t | Despeje: t = Δx / v",
+          title: "Selección de la ecuación horaria de MRU",
+          mathDevelopment: "Ecuación: x(t) = x₀ + v · t\nComo x₀ = 0 m ==> x = v · t",
+          appliedRule: "Ecuación Horaria del Movimiento Rectilíneo Uniforme (MRU)",
+          explanation: "Al tratarse de una velocidad constante sin aceleración, la distancia es directamente proporcional al producto de la velocidad por el tiempo.",
           practicalTip: "Despejar la incógnita de forma algebraica antes de reemplazar con números.",
         },
         {
           stepNumber: 4,
-          title: "Cálculo algebraico y análisis de sentido físico",
-          explanation: "Reemplazamos los datos, operamos numéricamente y simplificamos las unidades dimensionalmente.",
-          detailOrFormula: "Resultado = [Valor numérico] [Unidad SI]",
-          practicalTip: "Preguntarse siempre: ¿El resultado tiene sentido en la vida real?",
+          title: "Cálculo algebraico y simplificación de unidades",
+          mathDevelopment: "x = 20 (m/s) · 25 s\nx = (20 · 25) · (m · s / s)\nx = 500 m",
+          appliedRule: "Análisis Dimensional y Cancelación de Unidades",
+          explanation: "Multiplicamos 20 por 25 y simplificamos los segundos (s) en el numerador y denominador, obteniendo el resultado en metros (m).",
+          practicalTip: "Preguntarse siempre: ¿El resultado tiene sentido en la vida real? 500 metros en 25 s a 72 km/h es físicamente consistente.",
         },
       ],
-      finalAnswer: "Resultado obtenido con unidades correspondientes del Sistema Internacional (SI), verificado física y dimensionalmente.",
+      finalAnswer: "Distancia recorrida = 500 metros (x = 500 m)",
       pedagogicalTips: [
         "Enseñar al alumno a realizar un esquema gráfico o dibujo con el sistema de referencia y el sentido positivo.",
         "Hacer análisis dimensional cancelando unidades en el papel para evitar errores de cálculo.",
       ],
       commonPitfalls: [
-        "Mezclar horas con minutos o segundos sin hacer la conversión previa.",
-        "Olvidar colocar la unidad de medida en el resultado final.",
+        "Multiplicar directamente 72 km/h × 25 s sin convertir unidades previamente.",
+        "Olvidar colocar la unidad de medida (m) en el resultado final.",
       ],
-      reinforcementConcept: "En todo problema de física, el sistema de referencia elegido determina los signos de las velocidades y posiciones.",
+      reinforcementConcept: "En todo problema de física, las magnitudes deben estar en unidades homogéneas (SI: metros y segundos).",
     };
   }
 
   if (cleanSubject.includes("Química")) {
     return {
-      problemTitle: "Estructura Química, Uniones y Estequiometría",
+      problemTitle: "Estructura Química, Uniones y Lewis",
       subject: "Química",
       level: cleanLevel,
-      originalProblem: problemText || "Problema de química general",
+      originalProblem: problemText || "Representar la estructura de Lewis y determinar el tipo de unión del Dióxido de Carbono (CO₂).",
       stepByStep: [
         {
           stepNumber: 1,
-          title: "Ubicación en la Tabla Periódica y Electronegatividad",
-          explanation: "Identificamos el grupo, período y número de electrones de valencia (último nivel energético) de cada elemento.",
-          detailOrFormula: "Electrones de valencia = Número de Grupo (ej: C=IV A, O=VI A)",
+          title: "Ubicación en la Tabla Periódica y Electrones de Valencia",
+          mathDevelopment: "• Carbono (C): Grupo 14 (IV A) ==> 4 electrones de valencia (4 e⁻)\n• Oxígeno (O): Grupo 16 (VI A) ==> 6 electrones de valencia (6 e⁻)\n• Total e⁻ de valencia = 4 + 2·(6) = 16 e⁻",
+          appliedRule: "Configuración Electrónica de Valencia según Grupo",
+          explanation: "Identificamos los electrones del último nivel energético para cada átomo participante de la molécula.",
           practicalTip: "El número de grupo representativo indica directamente cuántos puntos o cruces dibujar en Lewis.",
         },
         {
           stepNumber: 2,
           title: "Determinación del Tipo de Unión Química",
-          explanation: "Calculamos la diferencia de electronegatividad (ΔEN). Si es Metal + No Metal es Iónica. Si es No Metal + No Metal es Covalente.",
-          detailOrFormula: "Iónica: Transferencia de e⁻ | Covalente: Compartición de pares de e⁻",
-          practicalTip: "Los metales pierden electrones (forman cationes +), los no metales ganan o comparten.",
+          mathDevelopment: "Carbono (No Metal) + Oxígeno (No Metal)\nΔEN = 3,44 - 2,55 = 0,89 (< 1,7)\n==> Unión Covalente (se comparten pares de e⁻)",
+          appliedRule: "Criterio de Electronegatividad (No Metal + No Metal = Covalente)",
+          explanation: "Al ser dos no metales, ninguno cede electrones de forma total, sino que comparten pares de electrones para completar sus octetos.",
+          practicalTip: "Los metales ceden e⁻ formando uniones iónicas; dos no metales siempre forman uniones covalentes.",
         },
         {
           stepNumber: 3,
           title: "Aplicación de la Regla del Octeto y Estructura de Lewis",
-          explanation: "Graficamos los símbolos químicos y distribuimos los electrones para que cada átomo alcance la estabilidad de 8 electrones (o 2 en H).",
-          detailOrFormula: "Octeto completo: 8 electrones en el nivel de valencia",
-          practicalTip: "El átomo menos electronegativo o el que forma más enlaces se coloca en el centro.",
+          mathDevelopment: "Disposición: O = C = O\n• Cada enlace doble (=) comparte 2 pares de e⁻ (4 e⁻ compartidos por cada O).\n• El Carbono central completa 8 e⁻ (4 pares enlazantes).\n• Cada Oxígeno completa 8 e⁻ (2 pares enlazantes + 2 pares libres).",
+          appliedRule: "Regla del Octeto de Lewis (8 electrones de valencia por átomo)",
+          explanation: "El carbono comparte dos pares de electrones con cada oxígeno, formando dos enlaces covalentes dobles.",
+          practicalTip: "El átomo con menor electronegatividad o mayor capacidad de enlace (Carbono) se coloca siempre en el centro.",
         },
         {
           stepNumber: 4,
-          title: "Formulación y Nomenclatura final",
-          explanation: "Escribimos la fórmula molecular o mínima y verificamos la neutralidad eléctrica de la molécula o compuesto.",
-          detailOrFormula: "Fórmula molecular desarrollada y de Lewis",
-          practicalTip: "Verificar que la suma de cargas o electrones compartidos sea exactamente la esperada.",
+          title: "Fórmula Desarrollada y Geometría Molecular",
+          mathDevelopment: "Fórmula desarrollada: O = C = O (Lineal, ángulo de 180°)\nFórmula molecular: CO₂",
+          appliedRule: "Geometría Molecular Lineal y Neutralidad",
+          explanation: "La molécula adopta una geometría lineal simétrica con dos dobles enlaces covalentes.",
+          practicalTip: "Verificar que la suma de cargas sea cero y que todos los átomos cumplan el octeto.",
         },
       ],
-      finalAnswer: "Estructura de Lewis y tipo de enlace determinados satisfactoriamente cumpliendo la regla del octeto de valencia.",
+      finalAnswer: "Unión Covalente Doble No Polar. Estructura lineal O = C = O con todos los octetos completos.",
       pedagogicalTips: [
         "Utilizar colores distintos para los electrones de cada elemento al graficar en el cuaderno.",
-        "Asociar los enlaces covalentes simples, dobles y triples a cuántos electrones faltan para llegar a 8.",
+        "Asociar los enlaces covalentes dobles a los 2 electrones que le faltaban al oxígeno para llegar a 8.",
       ],
       commonPitfalls: [
         "Poner corchetes con cargas en uniones covalentes (los corchetes son solo para compuestos iónicos).",
-        "Olvidar los pares de electrones libres o no enlazantes del átomo central.",
+        "Olvidar dibujar los dos pares de electrones libres sobre cada átomo de oxígeno.",
       ],
-      reinforcementConcept: "La regla del octeto impulsa a los átomos a enlazarse para adquirir la configuración electrónica del gas noble más cercano.",
+      reinforcementConcept: "La regla del octeto impulsa a los átomos a enlazarse para adquirir la configuración electrónica estable del gas noble.",
     };
   }
 
-  // Default Matemática
+  // Default Matemática (Ecuaciones y Fracciones)
   return {
-    problemTitle: "Resolución Paso a Paso: Operaciones y Ecuaciones",
+    problemTitle: "Resolución Didáctica Paso a Paso (Pizarrón)",
     subject: "Matemática",
     level: cleanLevel,
-    originalProblem: problemText || "Ejercicio de matemática",
+    originalProblem: problemText || "Resolver y verificar la siguiente ecuación: 2(x - 3) + 4 = 3x - 5",
     stepByStep: [
       {
         stepNumber: 1,
-        title: "Separar en términos y aplicar jerarquía de operaciones",
-        explanation: "Los signos de suma (+) y resta (-) que no están dentro de paréntesis separan los términos principales.",
-        detailOrFormula: "Término 1 + Término 2 = Término 3",
-        practicalTip: "Marcá 'arcos' por arriba de la cuenta para separar claramente cada término antes de empezar a operar.",
+        title: "Separar en términos y analizar el planteo inicial",
+        mathDevelopment: "Ecuación original:\n[2·(x - 3)] + [4] = [3x] - [5]\n(Hay 2 términos en el primer miembro y 2 en el segundo)",
+        appliedRule: "Jerarquía de Operaciones y Separación en Términos",
+        explanation: "Los signos más (+) y menos (-) que no están dentro de paréntesis delimitan los términos independientes a operar.",
+        practicalTip: "Marcá arcos por arriba de la cuenta en la hoja para no mezclar multiplicaciones con sumas.",
       },
       {
         stepNumber: 2,
-        title: "Eliminar paréntesis y aplicar propiedad distributiva si corresponde",
-        explanation: "Si hay un número multiplicando a un paréntesis, multiplica a cada elemento de su interior respetando la regla de los signos.",
-        detailOrFormula: "a · (b + c) = a·b + a·c | Regla de signos: (+)·(-)=(-), (-)·(-)=(+)",
-        practicalTip: "Cuidado con el signo menos adelante de un paréntesis: ¡le cambia el signo a TODO lo que está adentro!",
+        title: "Suprimir paréntesis aplicando la Propiedad Distributiva",
+        mathDevelopment: "2·(x) - 2·(3) + 4 = 3x - 5\n2x - 6 + 4 = 3x - 5\n2x - 2 = 3x - 5",
+        appliedRule: "Propiedad Distributiva del Producto respecto a la Resta: a·(b - c) = a·b - a·c",
+        explanation: "El 2 multiplica tanto a la incógnita 'x' como al número '3'. Luego reducimos los números independientes: -6 + 4 = -2.",
+        practicalTip: "¡Cuidado con la regla de los signos! (+2) · (-3) = -6.",
       },
       {
         stepNumber: 3,
-        title: "Agrupar términos con la incógnita de un lado y números del otro",
-        explanation: "Pasamos todos los términos que tienen 'x' al primer miembro y los números independientes al segundo miembro, cambiando la operación inversa.",
-        detailOrFormula: "Suma pasa a Resta | Multiplicación pasa a División",
-        practicalTip: "El número que está sumando pasa restando; el que está multiplicando pasa dividiendo SIN cambiarle el signo.",
+        title: "Agrupar términos con 'x' de un lado y números del otro",
+        mathDevelopment: "2x - 2 = 3x - 5\n2x - 3x = -5 + 2\n-1x = -3",
+        appliedRule: "Propiedad Uniforme (Pasaje de Términos con Operación Inversa)",
+        explanation: "El término '3x' que estaba sumando pasa restando al primer miembro, y el '-2' pasa sumando (+2) al segundo miembro.",
+        practicalTip: "Mantené el signo igual (=) bien alineado verticalmente en la hoja cuadriculada para no perder ningún término.",
       },
       {
         stepNumber: 4,
-        title: "Operar (denominador común o suma de coeficientes) y despejar 'x'",
-        explanation: "Reducimos los términos semejantes sumando o restando las fracciones/enteros y despejamos la variable final.",
-        detailOrFormula: "x = [Resultado simplificado]",
-        practicalTip: "Si trabajás con fracciones, simplificá el resultado final hasta obtener una fracción irreducible.",
+        title: "Despejar la incógnita 'x' simplificando signos",
+        mathDevelopment: "-1x = -3\nx = -3 / (-1)\nx = 3",
+        appliedRule: "Regla de los Signos en la División: (-) ÷ (-) = (+)",
+        explanation: "El '-1' que está multiplicando a la 'x' pasa dividiendo conservando su signo negativo. Menos dividido menos da más.",
+        practicalTip: "El número que multiplica pasa dividiendo CON su mismo signo, no cambia de signo.",
       },
       {
         stepNumber: 5,
-        title: "Verificación del resultado",
-        explanation: "Reemplazamos el valor hallado de 'x' en la ecuación original para constatar que ambos miembros den exactamente el mismo número.",
-        detailOrFormula: "Primer miembro = Segundo miembro (Identidad)",
+        title: "Verificación del resultado en la ecuación original",
+        mathDevelopment: "Reemplazamos x = 3:\nPrimer miembro: 2·(3 - 3) + 4 = 2·(0) + 4 = 0 + 4 = 4\nSegundo miembro: 3·(3) - 5 = 9 - 5 = 4\n==> 4 = 4  (Identidad comprobada ✓)",
+        appliedRule: "Método de Verificación por Sustitución Numérica",
+        explanation: "Reemplazamos el valor x = 3 en ambos miembros de la ecuación original y comprobamos que ambos den exactamente 4.",
         practicalTip: "Enseñale al alumno que la verificación es su propio 'seguro' en los exámenes para saber que sacó un 10.",
       },
     ],
-    finalAnswer: "Resultado final hallado y verificado paso a paso mediante propiedad uniforme y simplificación.",
+    finalAnswer: "x = 3 (Verificado: 4 = 4)",
     pedagogicalTips: [
-      "Recordar siempre la regla de los signos al multiplicar y dividir.",
-      "Mantener el signo igual (=) siempre alineado verticalmente en la hoja cuadriculada para evitar perder términos en el camino.",
-      "Trabajar con fracciones simplificadas desde el inicio para que las cuentas sean más pequeñas y rápidas.",
+      "Recordar siempre la regla de los signos: signos iguales dan positivo, signos opuestos dan negativo.",
+      "Trabajar en vertical en la hoja cuadriculada, renglón por renglón.",
+      "Hacer siempre la verificación sustituyendo el valor hallado en el enunciado original.",
     ],
     commonPitfalls: [
-      "Olvidar cambiar el signo al pasar un término sumando al otro miembro.",
-      "Distribuir solo con el primer término dentro del paréntesis y olvidarse del segundo.",
-      "Dividir o simplificar incorrectamente cuando hay sumas en el numerador.",
+      "Olvidar multiplicar el 2 por el segundo término (-3) al hacer la distributiva.",
+      "Cambiarle el signo a un número que pasa multiplicando o dividiendo.",
+      "Saltear renglones o pasos intermedios intentando hacer cálculos mentales.",
     ],
-    reinforcementConcept: "Toda ecuación es como una balanza en equilibrio: lo que se aplica de un lado debe aplicarse exactamente del otro.",
+    reinforcementConcept: "Toda ecuación es como una balanza en equilibrio: cualquier operación que se aplique de un lado debe aplicarse exactamente del otro.",
   };
 }
 
@@ -917,9 +943,16 @@ app.post("/api/solve-problem", async (req, res) => {
 
   try {
     const systemInstruction = `Eres un asistente pedagógico de primer nivel especializado en la educación primaria y secundaria de la Provincia de Buenos Aires, Argentina.
-Tu rol es asistir a la docente y maestra particular Patricia Morinigo para que pueda explicar y resolver ejercicios con máxima claridad, calidez y rigor didáctico.
+Tu rol es asistir a la docente y maestra particular Patricia Morinigo para que pueda explicar y resolver ejercicios con máxima claridad, calidez, rigor matemático/didáctico y exactitud numérica.
 Usa terminología escolar argentina adecuada (ej: "denominador común", "simplificación", "sujeto tácito", "modificador directo", "MRU", "ecuaciones de primer grado", "regla de tres simple", "uniones iónicas/covalentes").
-El desglose debe ser muy claro, paso a paso, con un lenguaje comprensible tanto para la profe como para el alumno, incluyendo tips pedagógicos para recordar el procedimiento y advertir errores comunes.`;
+
+REQUISITO ESTRUCTURAL OBLIGATORIO:
+1. 'originalProblem': Debe contener el enunciado completo y limpio del problema a resolver.
+2. Cada paso en 'stepByStep' DEBE estructurarse de forma dual y complementaria:
+   - 'mathDevelopment': El desarrollo numérico/algebraico/práctico REAL renglón a renglón con los números y operaciones exactas del ejercicio (como en el pizarrón o cuaderno del alumno). Muestra las ecuaciones con números, sustitución de valores, simplificaciones intermedias y despejes reales. En Lengua, muestra la oración con la marcación sintáctica.
+   - 'appliedRule': El nombre formal de la regla matemática, ley física, propiedad algebraica o regla gramatical aplicada en ese paso exacto (ej: 'Propiedad distributiva del producto respecto a la resta', 'Regla de los signos en la multiplicación', 'Factor común', '2da Ley de Newton (F = m·a)', 'Mínimo Común Múltiplo (mcm)', 'Concordancia entre Sujeto y Verbo').
+   - 'explanation': La explicación pedagógica clara y amigable de qué se hizo en ese renglón.
+   - 'practicalTip': Tip mnemotécnico o advertencia didáctica de la profe Patricia para no equivocarse.`;
 
     const promptText = `
 Materia: ${subject || "General"}
@@ -929,7 +962,7 @@ ${studentContext ? `Contexto del Alumno: ${studentContext}` : ""}
 Enunciado del problema a resolver:
 ${problemText || "(Ver imagen adjunta con el enunciado escolar)"}
 
-Por favor, resuelve el problema desglosándolo didácticamente y responde con la estructura JSON solicitada.`;
+Por favor, resuelve el problema desglosándolo didácticamente con el desarrollo numérico real renglón por renglón y las leyes/reglas pedagógicas aplicadas en cada paso. Responde con la estructura JSON solicitada.`;
 
     const parts: any[] = [];
     if (imageBase64) {
@@ -969,7 +1002,7 @@ Por favor, resuelve el problema desglosándolo didácticamente y responde con la
             },
             originalProblem: {
               type: Type.STRING,
-              description: "Transcripción limpia del enunciado",
+              description: "Transcripción limpia y completa del enunciado del ejercicio",
             },
             stepByStep: {
               type: Type.ARRAY,
@@ -977,17 +1010,25 @@ Por favor, resuelve el problema desglosándolo didácticamente y responde con la
                 type: Type.OBJECT,
                 properties: {
                   stepNumber: { type: Type.INTEGER },
-                  title: { type: Type.STRING, description: "Título del paso (ej: '1. Agrupar las x')" },
-                  explanation: { type: Type.STRING, description: "Explicación en palabras sencillas" },
-                  detailOrFormula: { type: Type.STRING, description: "Cálculo, regla gramatical o fórmula matemática exacta" },
-                  practicalTip: { type: Type.STRING, description: "Tip o truco mnemotécnico para este paso" },
+                  title: { type: Type.STRING, description: "Título del paso (ej: '1. Suprimir paréntesis aplicando propiedad distributiva')" },
+                  mathDevelopment: {
+                    type: Type.STRING,
+                    description: "Desarrollo numérico real, ecuación con números paso a paso, operaciones intermedias exactas o análisis sintáctico de pizarrón",
+                  },
+                  appliedRule: {
+                    type: Type.STRING,
+                    description: "Nombre de la regla, ley, teorema o propiedad matemática/física/lingüística aplicada",
+                  },
+                  explanation: { type: Type.STRING, description: "Explicación pedagógica clara en palabras sencillas" },
+                  detailOrFormula: { type: Type.STRING, description: "Fórmula general de apoyo (opcional)" },
+                  practicalTip: { type: Type.STRING, description: "Tip mnemotécnico o consejo práctico para este paso" },
                 },
-                required: ["stepNumber", "title", "explanation"],
+                required: ["stepNumber", "title", "mathDevelopment", "appliedRule", "explanation"],
               },
             },
             finalAnswer: {
               type: Type.STRING,
-              description: "Resultado final destacado y claro (con unidades si aplica)",
+              description: "Resultado final destacado y claro (con números, unidades o respuesta completa verificada)",
             },
             pedagogicalTips: {
               type: Type.ARRAY,
@@ -1004,7 +1045,7 @@ Por favor, resuelve el problema desglosándolo didácticamente y responde con la
               description: "Regla de oro o concepto fundamental que el alumno debe fijar",
             },
           },
-          required: ["problemTitle", "subject", "stepByStep", "finalAnswer", "pedagogicalTips", "commonPitfalls", "reinforcementConcept"],
+          required: ["problemTitle", "subject", "originalProblem", "stepByStep", "finalAnswer", "pedagogicalTips", "commonPitfalls", "reinforcementConcept"],
         },
       },
     });

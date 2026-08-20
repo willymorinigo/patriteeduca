@@ -51,9 +51,11 @@ export interface TopicRecord {
 export interface StepItem {
   stepNumber: number;
   title: string;
-  explanation: string;
-  detailOrFormula?: string;
-  practicalTip?: string;
+  mathDevelopment?: string; // Desarrollo numérico real, ecuación o cálculo de pizarrón
+  appliedRule?: string; // Regla, ley o propiedad pedagógica aplicada (ej: Propiedad distributiva, Regla de signos, etc.)
+  explanation: string; // Explicación didáctica paso a paso
+  practicalTip?: string; // Tip mnemotécnico o consejo de la profe
+  detailOrFormula?: string; // Compatible con versiones previas
 }
 
 export interface SolvedProblemResult {

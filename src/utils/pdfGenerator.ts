@@ -586,27 +586,27 @@ export function generateSolvedProblemPDF(solved: SolvedProblemResult, studentNam
 
   y += 24;
 
-  // Problem statement box
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
-  const origLines = doc.splitTextToSize(solved.originalProblem || solved.problemTitle, contentWidth - 12);
-  const origHeight = 9 + origLines.length * 4.4;
+  // Problem statement box (Enlarged and highlighted)
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+  const origLines = doc.splitTextToSize(solved.originalProblem || solved.problemTitle, contentWidth - 14);
+  const origHeight = 11 + origLines.length * 4.8;
 
   checkPageBreak(origHeight + 4);
-  doc.setFillColor(241, 245, 249);
-  doc.setDrawColor(203, 213, 225);
-  doc.setLineWidth(0.3);
-  doc.roundedRect(margin, y, contentWidth, origHeight, 1.5, 1.5, "FD");
+  doc.setFillColor(248, 250, 252);
+  doc.setDrawColor(71, 85, 105);
+  doc.setLineWidth(0.6);
+  doc.roundedRect(margin, y, contentWidth, origHeight, 1.8, 1.8, "FD");
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9);
-  doc.setTextColor(30, 41, 59);
-  doc.text("Enunciado del Ejercicio:", margin + 5, y + 5.5);
+  doc.setTextColor(30, 58, 138);
+  doc.text("ENUNCIADO DEL EJERCICIO PLANTEADO:", margin + 5, y + 5.5);
 
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
-  doc.setTextColor(51, 65, 85);
-  doc.text(origLines, margin + 5, y + 10);
+  doc.setFont("courier", "bold");
+  doc.setFontSize(10);
+  doc.setTextColor(15, 23, 42);
+  doc.text(origLines, margin + 5, y + 10.5);
 
   y += origHeight + 5;
 
@@ -623,23 +623,30 @@ export function generateSolvedProblemPDF(solved: SolvedProblemResult, studentNam
 
   // Step-by-step resolution
   solved.stepByStep.forEach((step) => {
+    // Applied rule tag if present
+    const ruleText = step.appliedRule ? `Regla/Ley: ${step.appliedRule}` : "";
+    const ruleLines = ruleText ? doc.splitTextToSize(ruleText, contentWidth - 14) : [];
+
+    // Math / Numerical Development
+    const mathContent = step.mathDevelopment || step.detailOrFormula;
+    const mathLines = mathContent ? doc.splitTextToSize(mathContent, contentWidth - 16) : [];
+
+    // Explanation
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8.5);
-    const expLines = doc.splitTextToSize(step.explanation, contentWidth - 12);
+    const expLines = doc.splitTextToSize(step.explanation, contentWidth - 14);
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    const detailLines = step.detailOrFormula ? doc.splitTextToSize(step.detailOrFormula, contentWidth - 14) : [];
-
+    // Tip
     doc.setFont("helvetica", "italic");
     doc.setFontSize(8);
-    const tipLines = step.practicalTip ? doc.splitTextToSize(`Tip: ${step.practicalTip}`, contentWidth - 14) : [];
+    const tipLines = step.practicalTip ? doc.splitTextToSize(`💡 Tip: ${step.practicalTip}`, contentWidth - 16) : [];
 
+    const ruleHeight = ruleLines.length > 0 ? 3 + ruleLines.length * 4 : 0;
+    const mathHeight = mathLines.length > 0 ? 6 + mathLines.length * 4.2 : 0;
     const expHeight = expLines.length * 4.2;
-    const detailHeight = detailLines.length > 0 ? 5 + detailLines.length * 4.2 : 0;
-    const tipHeight = tipLines.length > 0 ? 4 + tipLines.length * 3.8 : 0;
+    const tipHeight = tipLines.length > 0 ? 5 + tipLines.length * 3.8 : 0;
 
-    const totalStepBoxH = 6 + expHeight + detailHeight + tipHeight + 4;
+    const totalStepBoxH = 8 + ruleHeight + mathHeight + expHeight + tipHeight + 4;
 
     checkPageBreak(totalStepBoxH + 3);
 
@@ -655,6 +662,30 @@ export function generateSolvedProblemPDF(solved: SolvedProblemResult, studentNam
     doc.text(`Paso ${step.stepNumber}: ${step.title}`, margin + 4, y + 5);
     let curY = y + 5 + 4.5;
 
+    // Rule Tag
+    if (ruleLines.length > 0) {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      doc.setTextColor(79, 70, 229); // Indigo
+      doc.text(ruleLines, margin + 4, curY);
+      curY += ruleHeight + 1;
+    }
+
+    // Math/Numerical Development Box (Left / Primary block)
+    if (mathLines.length > 0) {
+      curY += 1;
+      const subBoxH = 4 + mathLines.length * 4.2;
+      doc.setFillColor(241, 245, 249);
+      doc.setDrawColor(203, 213, 225);
+      doc.roundedRect(margin + 4, curY, contentWidth - 8, subBoxH, 1, 1, "FD");
+
+      doc.setFont("courier", "bold");
+      doc.setFontSize(8.5);
+      doc.setTextColor(15, 23, 42);
+      doc.text(mathLines, margin + 7, curY + 3.8);
+      curY += subBoxH + 2.5;
+    }
+
     // Explanation
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8.5);
@@ -662,28 +693,18 @@ export function generateSolvedProblemPDF(solved: SolvedProblemResult, studentNam
     doc.text(expLines, margin + 4, curY);
     curY += expHeight;
 
-    // Formula/Detail sub-box if present
-    if (detailLines.length > 0) {
-      curY += 2;
-      const subBoxH = 4 + detailLines.length * 4.2;
-      doc.setFillColor(238, 242, 255);
-      doc.setDrawColor(199, 210, 254);
-      doc.roundedRect(margin + 4, curY, contentWidth - 8, subBoxH, 1, 1, "FD");
-
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(8.5);
-      doc.setTextColor(30, 64, 175);
-      doc.text(detailLines, margin + 7, curY + 4);
-      curY += subBoxH + 2;
-    }
-
     // Tip if present
     if (tipLines.length > 0) {
-      curY += 1;
+      curY += 2;
+      const tipBoxH = 3.5 + tipLines.length * 3.8;
+      doc.setFillColor(254, 243, 199);
+      doc.setDrawColor(245, 158, 11);
+      doc.roundedRect(margin + 4, curY, contentWidth - 8, tipBoxH, 1, 1, "FD");
+
       doc.setFont("helvetica", "italic");
-      doc.setFontSize(8);
-      doc.setTextColor(180, 83, 9);
-      doc.text(tipLines, margin + 5, curY + 2);
+      doc.setFontSize(7.5);
+      doc.setTextColor(146, 64, 14);
+      doc.text(tipLines, margin + 6, curY + 3.5);
     }
 
     y += totalStepBoxH + 3.5;
